@@ -8,12 +8,37 @@ add_subdirectory("vendor/imgui-1.92.5")
 add_subdirectory("vendor/stbimage-2.30.0")
 
 add_executable(Game
+  "source/DebugPanel.hpp"
+  "source/DebugPanel.cpp"
+  "source/Game.cpp"
+  "source/Game.hpp"
+  "source/Interface.hpp"
+  "source/Log.cpp"
+  "source/Log.hpp"
   "source/Main.cpp"
+  "source/Object.cpp"
+  "source/Object.hpp"
+  "source/Shader.hpp"
+  "source/Shader.cpp"
+  "source/Window.cpp"
+  "source/Window.hpp"
+)
+
+add_custom_command(
+  TARGET Game POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+  "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+  "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/assets"
 )
 
 target_link_libraries(Game
   PRIVATE
   glad glfw glm imgui stbimage
+)
+
+target_compile_definitions(Game
+  PRIVATE
+  "$<$<CONFIG:Debug>:LPS_DEBUG>"
 )
 
 target_precompile_headers(Game
@@ -25,4 +50,7 @@ set_target_properties(Game
   PROPERTIES
   CXX_STANDARD 20
   CXX_STANDARD_REQUIRED TRUE
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/lib"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/bin"
 )
