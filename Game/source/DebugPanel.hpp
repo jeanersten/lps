@@ -12,6 +12,7 @@ namespace LPS
 
     void Draw() override;
 
+    bool visible;
     int sleep_count;
     glm::vec3 clear_color;
   };

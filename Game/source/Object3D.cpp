@@ -1,40 +1,72 @@
 #include "LPSPCH.hpp"
 #include "Log.hpp"
-#include "Object.hpp"
+#include "Object3D.hpp"
 
 namespace LPS
 {
-  Object::Object(glm::vec2 position, glm::vec2 size, glm::vec4 color,
-                 const std::filesystem::path& path)
+  Object3D::Object3D(glm::vec3 position, glm::vec3 size, glm::vec4 color,
+                     const std::filesystem::path& path)
     : m_vao(0)
     , m_vbo(0)
+    , m_ebo(0)
     , m_vertices()
     , m_position(position)
     , m_size(size)
     , m_color(color)
   {
-    m_vertices.reserve(4);
+    m_vertices.reserve(8);
 
-    // top right (0)
-    m_vertices.push_back({{position.x + size.x, position.y, 0.0f},
-                           color, {1.0f, 1.0f}}); 
-      
-    // bottom right (1)
-    m_vertices.push_back({{position.x + size.x, position.y - size.y, 0.0f},
-                           color, {1.0f, 0.0f}}); 
+    float x1{ position.x };
+    float y1{ position.y };
+    float z1{ position.z };
+    float x2{ position.x + size.x };
+    float y2{ position.y - size.y };
+    float z2{ position.z - size.z };
 
-    // top left (2)
-    m_vertices.push_back({{position.x, position.y, 0.0f},
-                           color, {0.0f, 1.0f}}); 
+    // front
+    m_vertices.push_back({{x2, y1, z1}, color, {1.0f, 1.0f}});
+    m_vertices.push_back({{x2, y2, z1}, color, {1.0f, 0.0f}});
+    m_vertices.push_back({{x1, y1, z1}, color, {0.0f, 1.0f}});
+    m_vertices.push_back({{x1, y2, z1}, color, {0.0f, 0.0f}});
 
-    // bottom left (3)
-    m_vertices.push_back({{position.x, position.y - size.y, 0.0f},
-                           color, {0.0f, 0.0f}}); 
+    // back
+    m_vertices.push_back({{x1, y1, z2}, color, {1.0f, 1.0f}});
+    m_vertices.push_back({{x1, y2, z2}, color, {1.0f, 0.0f}});
+    m_vertices.push_back({{x2, y1, z2}, color, {0.0f, 1.0f}});
+    m_vertices.push_back({{x2, y2, z2}, color, {0.0f, 0.0f}});
+
+    // left
+    m_vertices.push_back({{x1, y1, z1}, color, {1.0f, 1.0f}});
+    m_vertices.push_back({{x1, y2, z1}, color, {1.0f, 0.0f}});
+    m_vertices.push_back({{x1, y1, z2}, color, {0.0f, 1.0f}});
+    m_vertices.push_back({{x1, y2, z2}, color, {0.0f, 0.0f}});
+
+    // right
+    m_vertices.push_back({{x2, y1, z2}, color, {1.0f, 1.0f}});
+    m_vertices.push_back({{x2, y2, z2}, color, {1.0f, 0.0f}});
+    m_vertices.push_back({{x2, y1, z1}, color, {0.0f, 1.0f}});
+    m_vertices.push_back({{x2, y2, z1}, color, {0.0f, 0.0f}});
+
+    // top
+    m_vertices.push_back({{x2, y2, z1}, color, {1.0f, 1.0f}});
+    m_vertices.push_back({{x2, y2, z2}, color, {1.0f, 0.0f}});
+    m_vertices.push_back({{x1, y2, z1}, color, {0.0f, 1.0f}});
+    m_vertices.push_back({{x1, y2, z2}, color, {0.0f, 0.0f}});
+
+    // bottom
+    m_vertices.push_back({{x2, y1, z2}, color, {1.0f, 1.0f}});
+    m_vertices.push_back({{x2, y1, z1}, color, {1.0f, 0.0f}});
+    m_vertices.push_back({{x1, y1, z2}, color, {0.0f, 1.0f}});
+    m_vertices.push_back({{x1, y1, z1}, color, {0.0f, 0.0f}});
         
     GLuint indices[]
     {
-      0, 1, 2,
-      2, 1, 3
+        0, 1, 2,  2, 1, 3,
+        4, 5, 6,  6, 5, 7,
+        8, 9, 10,  10, 9, 11,
+        12, 13, 14,  14, 13, 15,
+        16, 17, 18,  18, 17, 19,
+        20, 21, 22,  22, 21, 23
     };
 
     glGenVertexArrays(1, &m_vao);
@@ -89,7 +121,7 @@ namespace LPS
     glBindVertexArray(0);
   }
 
-  Object::~Object()
+  Object3D::~Object3D()
   {
     glDeleteVertexArrays(1, &m_vao);
     glDeleteBuffers(1, &m_vbo);
@@ -97,10 +129,11 @@ namespace LPS
     glDeleteTextures(1, &m_tex);
   }
 
-  void Object::Draw()
+  void Object3D::Draw()
   {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_tex);
     glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
   }
 }

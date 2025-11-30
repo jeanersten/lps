@@ -8,14 +8,16 @@
 
 namespace LPS
 {
-  class Object : public IDrawable
+  class Object2D : public IDrawable
   {
   public:
-    Object(glm::vec2 position, glm::vec2 size, glm::vec4 color,
-           const std::filesystem::path& texture_path);
-    virtual ~Object();
+    Object2D(glm::vec2 position, glm::vec2 size, glm::vec4 color,
+             const std::filesystem::path& texture_path);
+    virtual ~Object2D();
 
     void Draw() override;
+
+    glm::vec2 m_position;
 
   protected:
     struct Vertex
@@ -31,7 +33,6 @@ namespace LPS
     GLuint m_tex;
 
     std::vector<Vertex> m_vertices;
-    glm::vec2 m_position;
     glm::vec2 m_size;
     glm::vec4 m_color;
   };

@@ -24,6 +24,13 @@ namespace LPS
       glUniform4f(uniform_loc, val0, val1, val2, val3);
     }
 
+    inline void SetUniformMat4f(std::string_view name, glm::mat4 mat) const
+    {
+      int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };
+
+      glUniformMatrix4fv(uniform_loc, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
     inline void SetUniformInt(std::string_view name, int val) const
     {
       int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };

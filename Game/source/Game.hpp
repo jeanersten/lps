@@ -1,7 +1,8 @@
 #pragma once
 
 #include "DebugPanel.hpp"
-#include "Object.hpp"
+#include "Object2D.hpp"
+#include "Object3D.hpp"
 #include "Window.hpp"
 #include <memory>
 
@@ -21,7 +22,8 @@ namespace LPS
     Window m_window;
 
     std::unique_ptr<DebugPanel> m_panel;
-    std::unique_ptr<Object> m_object;
+    std::unique_ptr<Object2D> m_rect;
+    std::unique_ptr<Object3D> m_block;
 
     void Update();
     void Render();
