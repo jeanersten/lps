@@ -16,12 +16,19 @@ namespace LPS
     void Use() const;
 
     inline void SetUniformVec4f(std::string_view name,
-                                float v0, float v1,
-                                float v2, float v3) const
+                                float val0, float val1,
+                                float val2, float val3) const
     {
       int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };
 
-      glUniform4f(uniform_loc, v0, v1, v2, v3);
+      glUniform4f(uniform_loc, val0, val1, val2, val3);
+    }
+
+    inline void SetUniformInt(std::string_view name, int val) const
+    {
+      int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };
+      
+      glUniform1i(uniform_loc, val);
     }
 
   private:

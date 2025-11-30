@@ -43,7 +43,7 @@ namespace LPS
       GLFWimage image{ };
 
       image.pixels = stbi_load(std::filesystem::absolute(path).string().c_str(),
-                               &image.width, &image.height, 0, 4);
+                               &image.width, &image.height, nullptr, 4);
 
       LPS_ASSERT(image.pixels != nullptr, "Failed to load window icon");
 

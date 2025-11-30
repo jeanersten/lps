@@ -42,7 +42,8 @@ namespace LPS
     m_object = std::make_unique<Object>(
       glm::vec2{ -0.5f,  0.5f},
       glm::vec2{  1.0f,  1.0f},
-      glm::vec4{1.0f, 1.0f, 1.0f, 1.0f}
+      glm::vec4{1.0f, 1.0f, 1.0f, 1.0f},
+      "assets/image/Crow.jpg"
     );
   }
 
@@ -97,14 +98,11 @@ namespace LPS
   {
     m_window.Draw(m_panel.get());
     
-    static Shader shader{ "assets/shader/def_vertex.glsl",
-                          "assets/shader/unicol_fragment.glsl" };
-
-    float time_value{ static_cast<float>(glfwGetTime()) };
-    float sin_time{ static_cast<float>(glm::sin(time_value) / 2.0f) + 0.5f };
+    static Shader shader{ "assets/shader/tex2d_vertex.glsl",
+                          "assets/shader/tex2d_fragment.glsl" };
 
     shader.Use();
-    shader.SetUniformVec4f("uni_color", sin_time, 1.0f, 0.0f, 1.0f);
+    shader.SetUniformInt("img_texture", 0);
     m_window.Draw(m_object.get());
     glUseProgram(0);
   }

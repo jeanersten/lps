@@ -8,8 +8,8 @@ add_subdirectory("vendor/imgui-1.92.5")
 add_subdirectory("vendor/stbimage-2.30.0")
 
 add_executable(Game
-  "source/DebugPanel.hpp"
   "source/DebugPanel.cpp"
+  "source/DebugPanel.hpp"
   "source/Game.cpp"
   "source/Game.hpp"
   "source/Interface.hpp"
@@ -18,8 +18,8 @@ add_executable(Game
   "source/Main.cpp"
   "source/Object.cpp"
   "source/Object.hpp"
-  "source/Shader.hpp"
   "source/Shader.cpp"
+  "source/Shader.hpp"
   "source/Window.cpp"
   "source/Window.hpp"
 )
