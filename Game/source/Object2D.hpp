@@ -17,8 +17,6 @@ namespace LPS
 
     void Draw() override;
 
-    glm::vec2 m_position;
-
   protected:
     struct Vertex
     {
@@ -33,6 +31,7 @@ namespace LPS
     GLuint m_tex;
 
     std::vector<Vertex> m_vertices;
+    glm::vec2 m_position;
     glm::vec2 m_size;
     glm::vec4 m_color;
   };

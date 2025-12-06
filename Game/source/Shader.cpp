@@ -15,7 +15,7 @@ namespace LPS
                "Failed to open vertex shader file.");
     LPS_ASSERT(fshader_file.is_open(),
                "Failed to open fragment shader file.");
-    
+
     std::stringstream vshader_stream{ };
     std::stringstream fshader_stream{ };
 
@@ -66,13 +66,12 @@ namespace LPS
   void Shader::CheckError(GLuint id, bool is_program) const
   {
     int status{ };
-    
     char info_log[1024]{ };
 
     if (!is_program)
     {
       glGetShaderiv(id, GL_COMPILE_STATUS, &status);
-      
+
       if (status == GL_FALSE)
       {
         glGetShaderInfoLog(id, 1024, NULL, info_log);
@@ -82,7 +81,7 @@ namespace LPS
     else
     {
       glGetProgramiv(id, GL_LINK_STATUS, &status);
-      
+
       if (status == GL_FALSE)
       {
         glGetProgramInfoLog(id, 1024, NULL, info_log);

@@ -1,4 +1,5 @@
 #include "LPSPCH.hpp"
+#include "Log.hpp"
 #include "Game.hpp"
 #include "Object2D.hpp"
 #include "Object3D.hpp"
@@ -8,10 +9,11 @@ namespace LPS
 {
   Game::Game()
     : m_running(true)
-    , m_window(640, 480, "Little Physics Engine")
+    , m_window(640, 480, "Little Physics Simulation")
     , m_panel(nullptr)
     , m_rect(nullptr)
     , m_block(nullptr)
+    , m_objects()
   {
     m_window.SetIcon("assets/icon/lps.png");
 
@@ -42,17 +44,31 @@ namespace LPS
 
     m_panel = std::make_unique<DebugPanel>();
     m_rect = std::make_unique<Object2D>(
-      glm::vec2{ -0.5f,  0.5f},
-      glm::vec2{  1.0f,  1.0f},
+      glm::vec2{ 0.0f, 0.0f }, // Not currently used
+      glm::vec2{ 0.5f, 0.5f },
       glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
       "assets/image/Crow.jpg"
     );
     m_block = std::make_unique<Object3D>(
-      glm::vec3{ -0.5f,  0.5f, 1.0f},
-      glm::vec3{  1.0f,  1.0f, 1.0f },
+      glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
+      glm::vec3{ 0.5f, 0.5f, 0.5f },
       glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
       "assets/image/Crow.jpg"
     );
+
+    size_t object_count { 10 };
+
+    m_objects.reserve(object_count);
+
+    for (size_t i = 0; i < object_count; i++)
+    {
+      m_objects.push_back(std::make_unique<Object3D>(
+        glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
+        glm::vec3{ 0.5f, 0.5f, 0.5f },
+        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
+        "assets/image/Crow.jpg"
+      ));
+    }
   }
 
   Game::~Game()
@@ -67,6 +83,7 @@ namespace LPS
     while (m_running)
     {
       glfwPollEvents();
+
       if (glfwGetWindowAttrib(
         static_cast<GLFWwindow*>(m_window.GetNativeWindow()),
         GLFW_ICONIFIED) != 0
@@ -106,34 +123,51 @@ namespace LPS
   void Game::Render()
   {
     m_window.Draw(m_panel.get());
-    
+
     static Shader shader{ "assets/shader/vertex_shader.glsl",
                           "assets/shader/fragment_shader.glsl" };
 
-    glm::mat4 model{ 1.0f };
-    
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
-                        glm::vec3(1.0f, 1.0f, 1.0f));  
-
-    
     glm::mat4 view{ 1.0f };
-
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-
     glm::mat4 projection{ 1.0f };
-    float width { static_cast<float>(m_window.GetWidth()) };
-    float height { static_cast<float>(m_window.GetHeight()) };
+    float width{ static_cast<float>(m_window.GetWidth()) };
+    float height{ static_cast<float>(m_window.GetHeight()) };
 
-    projection = glm::perspective(glm::radians(45.0f), width / height,
+    view = glm::translate(view, glm::vec3{ 0.0f, 0.0f, -m_panel->view_z });
+    projection = glm::perspective(glm::radians(m_panel->fov), width / height,
                                   0.1f, 100.0f);
 
-    shader.Use();
-    shader.SetUniformInt("u_Sampler", 0);
-    shader.SetUniformMat4f("u_Model", model);
-    shader.SetUniformMat4f("u_View", view);
-    shader.SetUniformMat4f("u_Projection", projection);
-    // m_window.Draw(m_rect.get());
-    m_window.Draw(m_block.get());
+    static glm::vec3 obj_pos[] = {
+      glm::vec3{  0.0f,  0.0f, -01.0f },
+      glm::vec3{  2.0f,  5.0f, -15.0f },
+      glm::vec3{ -1.5f, -2.2f, -02.5f },
+      glm::vec3{ -3.8f, -2.0f, -12.3f },
+      glm::vec3{  2.4f, -0.4f, -03.5f },
+      glm::vec3{ -1.7f,  3.0f, -07.5f },
+      glm::vec3{  1.3f, -2.0f, -02.5f },
+      glm::vec3{  1.5f,  2.0f, -02.5f },
+      glm::vec3{  1.5f,  0.2f, -01.5f },
+      glm::vec3{ -1.3f,  1.0f, -01.5f }
+    };
+
+    for (int i = 0; i < m_objects.size(); i++)
+    {
+      glm::mat4 model{ 1.0f };
+      float angle{ 20.0f * i };
+      float time_elapsed{ static_cast<float>(glfwGetTime()) };
+
+      model = glm::translate(model, obj_pos[i]);
+      model = glm::rotate(model, glm::radians(angle * i),
+                          glm::vec3{ 1.0f, 0.3f, 0.5f });
+
+      shader.Use();
+      shader.SetUniformInt("u_Sampler", 0);
+      shader.SetUniformMat4f("u_Model", model);
+      shader.SetUniformMat4f("u_View", view);
+      shader.SetUniformMat4f("u_Projection", projection);
+
+      m_window.Draw(m_objects[i].get());
+    }
+
     glUseProgram(0);
   }
 }

@@ -5,6 +5,7 @@
 #include "Object3D.hpp"
 #include "Window.hpp"
 #include <memory>
+#include <vector>
 
 namespace LPS
 {
@@ -24,6 +25,8 @@ namespace LPS
     std::unique_ptr<DebugPanel> m_panel;
     std::unique_ptr<Object2D> m_rect;
     std::unique_ptr<Object3D> m_block;
+
+    std::vector<std::unique_ptr<Object3D>> m_objects;
 
     void Update();
     void Render();

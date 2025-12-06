@@ -15,17 +15,16 @@ namespace LPS
   {
     m_vertices.reserve(4);
 
-    float x1{ position.x };
-    float y1{ position.y };
+    float x1{ -size.x };
+    float y1{  size.y };
+    float x2{  size.x };
+    float y2{ -size.y };
 
-    float x2{ position.x + size.x};
-    float y2{ position.y - size.y};
+    m_vertices.push_back({ { x2, y1, 0.0f }, color, { 1.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y2, 0.0f }, color, { 1.0f, 0.0f } });
+    m_vertices.push_back({ { x1, y1, 0.0f }, color, { 0.0f, 1.0f } });
+    m_vertices.push_back({ { x1, y2, 0.0f }, color, { 0.0f, 0.0f } });
 
-    m_vertices.push_back({{x2, y1, 0.0f}, color, {1.0f, 1.0f}}); 
-    m_vertices.push_back({{x2, y2, 0.0f}, color, {1.0f, 0.0f}}); 
-    m_vertices.push_back({{x1, y1, 0.0f}, color, {0.0f, 1.0f}}); 
-    m_vertices.push_back({{x1, y2, 0.0f}, color, {0.0f, 0.0f}});
-        
     GLuint indices[]
     {
       0, 1, 2,

@@ -14,59 +14,59 @@ namespace LPS
     , m_size(size)
     , m_color(color)
   {
-    m_vertices.reserve(8);
+    m_vertices.reserve(24);
 
-    float x1{ position.x };
-    float y1{ position.y };
-    float z1{ position.z };
-    float x2{ position.x + size.x };
-    float y2{ position.y - size.y };
-    float z2{ position.z - size.z };
+    float x1{ -size.x };
+    float y1{  size.y };
+    float z1{  size.z };
+    float x2{  size.x };
+    float y2{ -size.y };
+    float z2{ -size.z };
 
     // front
-    m_vertices.push_back({{x2, y1, z1}, color, {1.0f, 1.0f}});
-    m_vertices.push_back({{x2, y2, z1}, color, {1.0f, 0.0f}});
-    m_vertices.push_back({{x1, y1, z1}, color, {0.0f, 1.0f}});
-    m_vertices.push_back({{x1, y2, z1}, color, {0.0f, 0.0f}});
+    m_vertices.push_back({ { x1, y1, z1 }, color, { 0.0f, 1.0f } });
+    m_vertices.push_back({ { x1, y2, z1 }, color, { 0.0f, 0.0f } });
+    m_vertices.push_back({ { x2, y1, z1 }, color, { 1.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y2, z1 }, color, { 1.0f, 0.0f } });
 
     // back
-    m_vertices.push_back({{x1, y1, z2}, color, {1.0f, 1.0f}});
-    m_vertices.push_back({{x1, y2, z2}, color, {1.0f, 0.0f}});
-    m_vertices.push_back({{x2, y1, z2}, color, {0.0f, 1.0f}});
-    m_vertices.push_back({{x2, y2, z2}, color, {0.0f, 0.0f}});
+    m_vertices.push_back({ { x1, y1, z2 }, color, { 1.0f, 1.0f } });
+    m_vertices.push_back({ { x1, y2, z2 }, color, { 1.0f, 0.0f } });
+    m_vertices.push_back({ { x2, y1, z2 }, color, { 0.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y2, z2 }, color, { 0.0f, 0.0f } });
 
     // left
-    m_vertices.push_back({{x1, y1, z1}, color, {1.0f, 1.0f}});
-    m_vertices.push_back({{x1, y2, z1}, color, {1.0f, 0.0f}});
-    m_vertices.push_back({{x1, y1, z2}, color, {0.0f, 1.0f}});
-    m_vertices.push_back({{x1, y2, z2}, color, {0.0f, 0.0f}});
+    m_vertices.push_back({ { x1, y1, z1 }, color, { 1.0f, 1.0f } });
+    m_vertices.push_back({ { x1, y2, z1 }, color, { 1.0f, 0.0f } });
+    m_vertices.push_back({ { x1, y1, z2 }, color, { 0.0f, 1.0f } });
+    m_vertices.push_back({ { x1, y2, z2 }, color, { 0.0f, 0.0f } });
 
     // right
-    m_vertices.push_back({{x2, y1, z2}, color, {1.0f, 1.0f}});
-    m_vertices.push_back({{x2, y2, z2}, color, {1.0f, 0.0f}});
-    m_vertices.push_back({{x2, y1, z1}, color, {0.0f, 1.0f}});
-    m_vertices.push_back({{x2, y2, z1}, color, {0.0f, 0.0f}});
+    m_vertices.push_back({ { x2, y1, z1 }, color, { 0.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y2, z1 }, color, { 0.0f, 0.0f } });
+    m_vertices.push_back({ { x2, y1, z2 }, color, { 1.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y2, z2 }, color, { 1.0f, 0.0f } });
 
     // top
-    m_vertices.push_back({{x2, y2, z1}, color, {1.0f, 1.0f}});
-    m_vertices.push_back({{x2, y2, z2}, color, {1.0f, 0.0f}});
-    m_vertices.push_back({{x1, y2, z1}, color, {0.0f, 1.0f}});
-    m_vertices.push_back({{x1, y2, z2}, color, {0.0f, 0.0f}});
+    m_vertices.push_back({ { x1, y1, z1 }, color, { 0.0f, 0.0f } });
+    m_vertices.push_back({ { x1, y1, z2 }, color, { 0.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y1, z1 }, color, { 1.0f, 0.0f } });
+    m_vertices.push_back({ { x2, y1, z2 }, color, { 1.0f, 1.0f } });
 
     // bottom
-    m_vertices.push_back({{x2, y1, z2}, color, {1.0f, 1.0f}});
-    m_vertices.push_back({{x2, y1, z1}, color, {1.0f, 0.0f}});
-    m_vertices.push_back({{x1, y1, z2}, color, {0.0f, 1.0f}});
-    m_vertices.push_back({{x1, y1, z1}, color, {0.0f, 0.0f}});
-        
+    m_vertices.push_back({ { x1, y2, z1 }, color, { 1.0f, 0.0f } });
+    m_vertices.push_back({ { x1, y2, z2 }, color, { 1.0f, 1.0f } });
+    m_vertices.push_back({ { x2, y2, z1 }, color, { 0.0f, 0.0f } });
+    m_vertices.push_back({ { x2, y2, z2 }, color, { 0.0f, 1.0f } });
+
     GLuint indices[]
     {
-        0, 1, 2,  2, 1, 3,
-        4, 5, 6,  6, 5, 7,
-        8, 9, 10,  10, 9, 11,
-        12, 13, 14,  14, 13, 15,
-        16, 17, 18,  18, 17, 19,
-        20, 21, 22,  22, 21, 23
+      0,  1,  2,   2,  1,  3,
+      4,  5,  6,   6,  5,  7,
+      8,  9,  10,  10, 9,  11,
+      12, 13, 14,  14, 13, 15,
+      16, 17, 18,  18, 17, 19,
+      20, 21, 22,  22, 21, 23
     };
 
     glGenVertexArrays(1, &m_vao);

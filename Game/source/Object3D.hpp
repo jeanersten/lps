@@ -17,20 +17,19 @@ namespace LPS
 
     void Draw() override;
 
-    
-    protected:
+  protected:
     struct Vertex
     {
       glm::vec3 pos;
       glm::vec4 color;
       glm::vec2 tex_coords;
     };
-    
+
     GLuint m_vao;
     GLuint m_vbo;
     GLuint m_ebo;
     GLuint m_tex;
-    
+
     std::vector<Vertex> m_vertices;
     glm::vec3 m_position;
     glm::vec3 m_size;

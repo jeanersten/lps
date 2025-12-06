@@ -15,5 +15,10 @@ namespace LPS
     bool visible;
     int sleep_count;
     glm::vec3 clear_color;
+    float view_z;
+    float fov;
+    float f1;
+    float f2;
+    float f3;
   };
 }
