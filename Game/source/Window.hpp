@@ -28,6 +28,11 @@ namespace LPS
       return m_height;
     }
 
+    inline int GetKeyState(int code) const
+    {
+      return glfwGetKey(m_object, code);
+    }
+
     inline void* GetNativeWindow() const
     {
       return m_object;

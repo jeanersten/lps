@@ -124,20 +124,48 @@ namespace LPS
   {
     m_window.Draw(m_panel.get());
 
+    float time_elapsed{ static_cast<float>(glfwGetTime()) };
+
     static Shader shader{ "assets/shader/vertex_shader.glsl",
                           "assets/shader/fragment_shader.glsl" };
 
-    glm::mat4 view{ 1.0f };
     glm::mat4 projection{ 1.0f };
     float width{ static_cast<float>(m_window.GetWidth()) };
     float height{ static_cast<float>(m_window.GetHeight()) };
 
-    view = glm::translate(view, glm::vec3{ 0.0f, 0.0f, -m_panel->view_z });
     projection = glm::perspective(glm::radians(m_panel->fov), width / height,
                                   0.1f, 100.0f);
 
+    glm::mat4 view{ 1.0f };
+    static glm::vec3 cam_pos{ glm::vec3(0.0f, 0.0f,  3.0f) };
+    static glm::vec3 cam_target{ glm::vec3(0.0f, 0.0f, -1.0f) };
+    static glm::vec3 cam_up { glm::vec3(0.0f, 1.0f,  0.0f) };
+    const float cam_speed = 0.05f;
+
+    if (m_window.GetKeyState(GLFW_KEY_W) == GLFW_PRESS)
+    {
+      cam_pos += cam_speed * cam_target;
+    }
+
+    if (m_window.GetKeyState(GLFW_KEY_S) == GLFW_PRESS)
+    {
+      cam_pos -= cam_speed * cam_target;
+    }
+
+    if (m_window.GetKeyState(GLFW_KEY_A) == GLFW_PRESS)
+    {
+      cam_pos -= glm::normalize(glm::cross(cam_target, cam_up)) * cam_speed;
+    }
+
+    if (m_window.GetKeyState(GLFW_KEY_D) == GLFW_PRESS)
+    {
+      cam_pos += glm::normalize(glm::cross(cam_target, cam_up)) * cam_speed;
+    }
+
+    view = glm::lookAt(cam_pos, cam_pos + cam_target, cam_up);
+
     static glm::vec3 obj_pos[] = {
-      glm::vec3{  0.0f,  0.0f, -01.0f },
+      glm::vec3{  0.0f,  0.0f,  00.0f },
       glm::vec3{  2.0f,  5.0f, -15.0f },
       glm::vec3{ -1.5f, -2.2f, -02.5f },
       glm::vec3{ -3.8f, -2.0f, -12.3f },
@@ -153,10 +181,9 @@ namespace LPS
     {
       glm::mat4 model{ 1.0f };
       float angle{ 20.0f * i };
-      float time_elapsed{ static_cast<float>(glfwGetTime()) };
 
       model = glm::translate(model, obj_pos[i]);
-      model = glm::rotate(model, glm::radians(angle * i),
+      model = glm::rotate(model, glm::radians(angle),
                           glm::vec3{ 1.0f, 0.3f, 0.5f });
 
       shader.Use();
