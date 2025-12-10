@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Camera.hpp"
 #include "DebugPanel.hpp"
 #include "Object2D.hpp"
 #include "Object3D.hpp"
@@ -24,6 +25,7 @@ namespace LPS
 
     float m_delta_time;
 
+    std::unique_ptr<Camera> m_camera;
     std::unique_ptr<DebugPanel> m_panel;
     std::unique_ptr<Object2D> m_rect;
     std::unique_ptr<Object3D> m_block;
@@ -40,10 +42,7 @@ namespace LPS
     };
 
     bool m_user_key[KEY_SIZE];
-
-    glm::vec3 cam_pos{ glm::vec3(0.0f, 0.0f,  3.0f) };
-    glm::vec3 cam_target{ glm::vec3(0.0f, 0.0f, -1.0f) };
-    glm::vec3 cam_up { glm::vec3(0.0f, 1.0f,  0.0f) };
+    bool m_first_mouse;
 
     void Update();
     void Render();
