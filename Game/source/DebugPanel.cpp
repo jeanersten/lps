@@ -4,14 +4,13 @@
 namespace LPS
 {
   DebugPanel::DebugPanel()
-    : visible(false)
-    , clear_color(0.2f, 0.2f, 0.2f)
+    : visible(true)
     , sleep_count(10)
+    , vsync(false)
+    , clear_color(0.2f, 0.2f, 0.2f)
     , view_z(5.0f)
     , fov(45.0f)
-    , f1(0.0f)
-    , f2(0.0f)
-    , f3(0.0f)
+    , visibility_callback()
   {}
 
   void DebugPanel::Draw()
@@ -28,8 +27,6 @@ namespace LPS
 
       ImGuiWindowFlags flags{ ImGuiWindowFlags_NoCollapse };
 
-      static bool show_demo{ false };
-
       ImGui::Begin("Debug Panel", nullptr, flags);
 
       ImGui::Text("Average FPS: %.1f", io.Framerate);
@@ -38,23 +35,16 @@ namespace LPS
       ImGui::Text("Clear Color");
       ImGui::ColorEdit3("##a", (float*)&clear_color);
       ImGui::Dummy(ImVec2{ 0.0f, 20.0f });
+      ImGui::Text("Vsync");
+      if (ImGui::Checkbox("Vsync", &vsync))
+      {
+        glfwSwapInterval(vsync ? 1 : 0);
+      }
       ImGui::Text("Thread Sleep Count (ms)");
       ImGui::SliderInt("##b", &sleep_count, 0, 50);
-      ImGui::Text("View Z");
-      ImGui::SliderFloat("##c", &view_z, 0.0f, 100.0f);
       ImGui::Text("Field of View");
-      ImGui::SliderFloat("##d", &fov, 0.0f, 360.0f);
+      ImGui::SliderFloat("##d", &fov, 1.0f, 360.0f);
       ImGui::Dummy(ImVec2{ 0.0f, 20.0f });
-      ImGui::SliderFloat("Float 1", &f1, -180.0f, 180.0f);
-      ImGui::SliderFloat("Float 2", &f2, -180.0f, 180.0f);
-      ImGui::SliderFloat("Float 3", &f3, -180.0f, 180.0f);
-      ImGui::Dummy(ImVec2{ 0.0f, 20.0f });
-      ImGui::Checkbox("Show Demo Window", &show_demo);
-
-      if (show_demo)
-      {
-        ImGui::ShowDemoWindow(&show_demo);
-      }
 
       ImGui::End();
     }
@@ -62,6 +52,8 @@ namespace LPS
     if (ImGui::IsKeyPressed(ImGuiKey_Space))
     {
       visible = !visible;
+
+      if (visibility_callback) visibility_callback(visible);
     }
   }
 }

@@ -52,6 +52,27 @@ namespace LPS
 
       glViewport(0, 0, width, height);
     });
+
+    glfwSetKeyCallback(m_object, [](GLFWwindow* window, int key, int scancode,
+                                    int action, int mods) -> void{
+      Window* self{ static_cast<Window*>(glfwGetWindowUserPointer(window)) };
+
+      if (self->m_key_callback) self->m_key_callback(key, action);
+    });
+
+    glfwSetCursorPosCallback(m_object, [](GLFWwindow* window,
+                                          double xpos, double ypos) -> void{
+      Window* self{ static_cast<Window*>(glfwGetWindowUserPointer(window)) };
+
+      if (self->m_mouse_callback) self->m_mouse_callback(xpos, ypos);
+    });
+
+    glfwSetScrollCallback(m_object, [](GLFWwindow* window,
+                                       double xoffset, double yoffset) -> void{
+      Window* self{ static_cast<Window*>(glfwGetWindowUserPointer(window)) };
+
+      if (self->m_scroll_callback) self->m_scroll_callback(xoffset, yoffset);
+    });
   }
 
   Window::~Window()

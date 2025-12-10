@@ -10,12 +10,24 @@ namespace LPS
   Game::Game()
     : m_running(true)
     , m_window(640, 480, "Little Physics Simulation")
+    , m_delta_time(0.0f)
     , m_panel(nullptr)
     , m_rect(nullptr)
     , m_block(nullptr)
     , m_objects()
+    , m_user_key(false)
   {
     m_window.SetIcon("assets/icon/lps.png");
+
+    m_window.SetKeyCallback([this](int key, int action) -> void{
+      HandleKeyboard(key, action);
+    });
+    m_window.SetMouseCallback([this](double xpos, double ypos) -> void{
+      HandleMouse(xpos, ypos);
+    });
+    m_window.SetScrollCallback([this](double xoffset, double yoffset) -> void{
+      HandleScroll(xoffset, yoffset);
+    });
 
     const char* glsl_ver{ "#version 330" };
     float main_scale{
@@ -37,12 +49,14 @@ namespace LPS
 
     ImGui::StyleColorsClassic();
 
-    ImGui_ImplGlfw_InitForOpenGL(
-      static_cast<GLFWwindow*>(m_window.GetNativeWindow()), true
-    );
+    ImGui_ImplGlfw_InitForOpenGL(m_window.GetNativeWindow(), true);
     ImGui_ImplOpenGL3_Init(glsl_ver);
 
     m_panel = std::make_unique<DebugPanel>();
+    m_panel->visibility_callback = [this](bool visible) -> void{
+      HandlePanelVisibility(visible);
+    };
+
     m_rect = std::make_unique<Object2D>(
       glm::vec2{ 0.0f, 0.0f }, // Not currently used
       glm::vec2{ 0.5f, 0.5f },
@@ -84,10 +98,7 @@ namespace LPS
     {
       glfwPollEvents();
 
-      if (glfwGetWindowAttrib(
-        static_cast<GLFWwindow*>(m_window.GetNativeWindow()),
-        GLFW_ICONIFIED) != 0
-      )
+      if (glfwGetWindowAttrib(m_window.GetNativeWindow(), GLFW_ICONIFIED) != 0)
       {
         ImGui_ImplGlfw_Sleep(50);
 
@@ -118,7 +129,13 @@ namespace LPS
   }
 
   void Game::Update()
-  {}
+  {
+    float cf_time{ static_cast<float>(glfwGetTime()) };
+    static float lf_time{ 0.f };
+
+    m_delta_time = cf_time - lf_time;
+    lf_time = cf_time;
+  }
 
   void Game::Render()
   {
@@ -136,28 +153,26 @@ namespace LPS
     projection = glm::perspective(glm::radians(m_panel->fov), width / height,
                                   0.1f, 100.0f);
 
+    const float cam_speed { 2.5f * m_delta_time };
+
     glm::mat4 view{ 1.0f };
-    static glm::vec3 cam_pos{ glm::vec3(0.0f, 0.0f,  3.0f) };
-    static glm::vec3 cam_target{ glm::vec3(0.0f, 0.0f, -1.0f) };
-    static glm::vec3 cam_up { glm::vec3(0.0f, 1.0f,  0.0f) };
-    const float cam_speed = 0.05f;
 
-    if (m_window.GetKeyState(GLFW_KEY_W) == GLFW_PRESS)
+    if (m_user_key[KEY_UP])
     {
-      cam_pos += cam_speed * cam_target;
+      cam_pos += cam_target * cam_speed;
     }
 
-    if (m_window.GetKeyState(GLFW_KEY_S) == GLFW_PRESS)
+    if (m_user_key[KEY_DOWN])
     {
-      cam_pos -= cam_speed * cam_target;
+      cam_pos -= cam_target * cam_speed;
     }
 
-    if (m_window.GetKeyState(GLFW_KEY_A) == GLFW_PRESS)
+    if (m_user_key[KEY_LEFT])
     {
       cam_pos -= glm::normalize(glm::cross(cam_target, cam_up)) * cam_speed;
     }
 
-    if (m_window.GetKeyState(GLFW_KEY_D) == GLFW_PRESS)
+    if (m_user_key[KEY_RIGHT])
     {
       cam_pos += glm::normalize(glm::cross(cam_target, cam_up)) * cam_speed;
     }
@@ -185,6 +200,8 @@ namespace LPS
       model = glm::translate(model, obj_pos[i]);
       model = glm::rotate(model, glm::radians(angle),
                           glm::vec3{ 1.0f, 0.3f, 0.5f });
+      model = glm::rotate(model, glm::radians(angle) * time_elapsed * 2,
+                          glm::vec3{ 0.3f, 0.5f, 0.8f });
 
       shader.Use();
       shader.SetUniformInt("u_Sampler", 0);
@@ -196,5 +213,135 @@ namespace LPS
     }
 
     glUseProgram(0);
+  }
+
+  void Game::HandleKeyboard(int code, int action)
+  {
+    if (m_panel->visible)
+    {
+      for (size_t i = 0; i < KEY_SIZE; i++)
+      {
+        m_user_key[i] = false;
+      }
+
+      return;
+    }
+
+    if (action == GLFW_PRESS)
+    {
+      switch (code)
+      {
+        case GLFW_KEY_W:
+        case GLFW_KEY_UP:
+        {
+          m_user_key[KEY_UP] = true;
+        } break;
+
+        case GLFW_KEY_S:
+        case GLFW_KEY_DOWN:
+        {
+          m_user_key[KEY_DOWN] = true;
+        } break;
+
+        case GLFW_KEY_A:
+        case GLFW_KEY_LEFT:
+        {
+          m_user_key[KEY_LEFT] = true;
+        } break;
+
+        case GLFW_KEY_D:
+        case GLFW_KEY_RIGHT:
+        {
+          m_user_key[KEY_RIGHT] = true;
+        } break;
+      }
+    }
+
+    if (action == GLFW_RELEASE)
+    {
+      switch (code)
+      {
+        case GLFW_KEY_W:
+        case GLFW_KEY_UP:
+        {
+          m_user_key[KEY_UP] = false;
+        } break;
+
+        case GLFW_KEY_S:
+        case GLFW_KEY_DOWN:
+        {
+          m_user_key[KEY_DOWN] = false;
+        } break;
+
+        case GLFW_KEY_A:
+        case GLFW_KEY_LEFT:
+        {
+          m_user_key[KEY_LEFT] = false;
+        } break;
+
+        case GLFW_KEY_D:
+        case GLFW_KEY_RIGHT:
+        {
+          m_user_key[KEY_RIGHT] = false;
+        } break;
+      }
+    }
+  }
+
+  void Game::HandleMouse(double xpos, double ypos)
+  {
+    if (m_panel->visible) return;
+
+    static bool  first_mouse{ true };
+    static float yaw{ -90.0f };
+    static float pitch{  0.0f };
+    static float last_mouse_x{ m_window.GetWidth() / 2.0f };
+    static float last_mouse_y{ m_window.GetHeight() / 2.0f };
+    float mouse_x{ static_cast<float>(xpos) };
+    float mouse_y{ static_cast<float>(ypos) };
+
+    if (first_mouse)
+    {
+      last_mouse_x = mouse_x;
+      last_mouse_y = mouse_y;
+      first_mouse = false;
+    }
+
+    float xoffset{ mouse_x - last_mouse_x };
+    float yoffset{ last_mouse_y - mouse_y };
+    last_mouse_x = xpos;
+    last_mouse_y = ypos;
+
+    float sensitivity{ 0.1f };
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f) pitch = 89.0f;
+    if (pitch < -89.0f) pitch = -89.0f;
+
+    glm::vec3 target{ 0.0f, 0.0f, 0.0f };
+    target.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    target.y = sin(glm::radians(pitch));
+    target.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cam_target = glm::normalize(target);
+  }
+
+  void Game::HandleScroll(double xoffset, double yoffset)
+  {
+    if (m_panel->visible) return;
+
+    m_panel->fov -= static_cast<float>(yoffset);
+
+    if (m_panel->fov < 1.0f) m_panel->fov = 1.0f;
+    if (m_panel->fov > 360.0f) m_panel->fov = 360.0f;
+  }
+
+  void Game::HandlePanelVisibility(bool visible)
+  {
+    glfwSetInputMode(m_window.GetNativeWindow(), GLFW_CURSOR,
+                     visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
   }
 }

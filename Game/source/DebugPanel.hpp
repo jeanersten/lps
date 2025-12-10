@@ -1,24 +1,26 @@
 #pragma once
 
 #include "Interface.hpp"
-#include <GLM/glm.hpp>
+#include <glm/glm.hpp>
+#include <functional>
 
 namespace LPS
 {
   class DebugPanel : public IDrawable
   {
+    using VisibilityCallbackFunc = std::function<void(bool visible)>;
+
   public:
     DebugPanel();
 
-    void Draw() override;
-
     bool visible;
     int sleep_count;
+    bool vsync;
     glm::vec3 clear_color;
     float view_z;
     float fov;
-    float f1;
-    float f2;
-    float f3;
+    VisibilityCallbackFunc visibility_callback;
+
+    void Draw() override;
   };
 }

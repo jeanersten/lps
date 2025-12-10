@@ -2,7 +2,7 @@
 
 #include "Interface.hpp"
 #include <GLAD/gl.h>
-#include <GLM/glm.hpp>
+#include <glm/glm.hpp>
 #include <filesystem>
 #include <vector>
 
