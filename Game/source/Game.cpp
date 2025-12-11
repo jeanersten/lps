@@ -54,7 +54,10 @@ namespace LPS
     ImGui_ImplGlfw_InitForOpenGL(m_window.GetNativeWindow(), true);
     ImGui_ImplOpenGL3_Init(glsl_ver);
 
-    m_camera = std::make_unique<Camera>();
+    float wnd_width{ static_cast<float>(m_window.GetWidth()) };
+    float wnd_height{ static_cast<float>(m_window.GetHeight()) };
+
+    m_camera = std::make_unique<Camera>(glm::vec2{ wnd_width, wnd_height });
 
     m_panel = std::make_unique<DebugPanel>();
     m_panel->visibility_callback = [this](bool visible) -> void{
@@ -105,7 +108,7 @@ namespace LPS
 
       if (glfwGetWindowAttrib(m_window.GetNativeWindow(), GLFW_ICONIFIED) != 0)
       {
-        ImGui_ImplGlfw_Sleep(50);
+        ImGui_ImplGlfw_Sleep(10);
 
         continue;
       }
@@ -127,8 +130,6 @@ namespace LPS
 
       m_window.SwapBuffers();
 
-      ImGui_ImplGlfw_Sleep(m_panel->sleep_count);
-
       if (m_window.ShouldClose()) m_running = false;
     }
   }
@@ -141,7 +142,12 @@ namespace LPS
     m_delta_time = cf_time - lf_time;
     lf_time = cf_time;
 
+    float wnd_width{ static_cast<float>(m_window.GetWidth()) };
+    float wnd_height{ static_cast<float>(m_window.GetHeight()) };
+
     m_camera->Update();
+    m_camera->SetSize(glm::vec2{ wnd_width, wnd_height });
+    m_camera->SetFov(m_panel->fov);
   }
 
   void Game::Render()
@@ -152,13 +158,6 @@ namespace LPS
 
     static Shader shader{ "assets/shader/vertex_shader.glsl",
                           "assets/shader/fragment_shader.glsl" };
-
-    glm::mat4 projection{ 1.0f };
-    float width{ static_cast<float>(m_window.GetWidth()) };
-    float height{ static_cast<float>(m_window.GetHeight()) };
-
-    projection = glm::perspective(m_camera->GetFov(), width / height,
-                                  0.1f, 100.0f);
 
     const float cam_speed { 2.5f * m_delta_time };
 
@@ -209,8 +208,8 @@ namespace LPS
       shader.Use();
       shader.SetUniformInt("u_Sampler", 0);
       shader.SetUniformMat4f("u_Model", model);
-      shader.SetUniformMat4f("u_View", m_camera->GetMatrix());
-      shader.SetUniformMat4f("u_Projection", projection);
+      shader.SetUniformMat4f("u_View", m_camera->GetViewMatrix());
+      shader.SetUniformMat4f("u_Projection", m_camera->GetProjectionMatrix());
 
       m_window.Draw(m_objects[i].get());
     }
@@ -336,8 +335,6 @@ namespace LPS
 
     if (m_panel->fov < 1.0f) m_panel->fov = 1.0f;
     if (m_panel->fov > 360.0f) m_panel->fov = 360.0f;
-
-    m_camera->SetFov(m_panel->fov);
   }
 
   void Game::HandlePanelVisibility(bool visible)

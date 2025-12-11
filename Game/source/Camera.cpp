@@ -3,23 +3,24 @@
 
 namespace LPS
 {
-  Camera::Camera()
+  Camera::Camera(glm::vec2 size)
     : m_pos(0.0f, 0.0f, 3.0f)
+    , m_size(size)
     , m_front(0.0f, 0.0f, 3.0f)
     , m_up(0.0f, 1.0f, 0.0f)
     , m_right(0.0f, 0.0f, 0.0f)
-    , m_fov(45.0f)
     , m_yaw(-90.0f)
     , m_pitch(0.0f)
+    , m_fov(45.0f)
   {}
 
   void Camera::Update()
   {
     glm::vec3 front{ 0.0f, 0.0f, 0.0f };
 
-    front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    front.y = sin(glm::radians(m_pitch));
-    front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+    front.x = glm::cos(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
+    front.y = glm::sin(glm::radians(m_pitch));
+    front.z = glm::sin(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
 
     m_front = glm::normalize(front);
     m_right = glm::normalize(glm::cross(m_front, { 0.0f, 1.0f, 0.0f }));

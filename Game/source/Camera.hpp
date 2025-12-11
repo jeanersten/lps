@@ -3,6 +3,7 @@
 #include "Shader.hpp"
 #include "Window.hpp"
 #include <GLAD/gl.h>
+#include <glm/glm.hpp>
 #include <string_view>
 
 namespace LPS
@@ -10,7 +11,7 @@ namespace LPS
   class Camera
   {
   public:
-    Camera();
+    Camera(glm::vec2 size);
 
     void Update();
     void MoveForward(float speed);
@@ -18,19 +19,20 @@ namespace LPS
     void MoveLeft(float speed);
     void MoveRight(float speed);
 
-    inline glm::mat4 GetMatrix() const
+    inline glm::mat4 GetViewMatrix() const
     {
       return glm::lookAt(m_pos, m_pos + m_front, m_up);
     }
 
-    inline float GetFov() const
+    inline glm::mat4 GetProjectionMatrix() const
     {
-      return m_fov;
+      return glm::perspective(glm::radians(m_fov), m_size.x / m_size.y,
+                              0.1f, 100.0f);
     }
 
-    inline void SetFov(float val)
+    inline void SetSize(glm::vec2 val)
     {
-      m_fov = val;
+      m_size = val;
     }
 
     inline void SetYaw(float val)
@@ -43,13 +45,19 @@ namespace LPS
       m_pitch = val;
     }
 
+    inline void SetFov(float val)
+    {
+      m_fov = val;
+    }
+
   private:
     glm::vec3 m_pos;
+    glm::vec2 m_size;
     glm::vec3 m_front;
     glm::vec3 m_up;
     glm::vec3 m_right;
-    float m_fov;
     float m_yaw;
     float m_pitch;
+    float m_fov;
   };
 }
