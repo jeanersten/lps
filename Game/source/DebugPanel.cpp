@@ -5,13 +5,14 @@ namespace LPS
 {
   DebugPanel::DebugPanel()
     : visible(true)
-    , sleep_count(10)
-    , vsync(false)
+    , vsync(true)
     , clear_color(0.2f, 0.2f, 0.2f)
     , view_z(5.0f)
     , fov(45.0f)
     , visibility_callback()
-  {}
+  {
+    glfwSwapInterval(vsync ? 1 : 0);
+  }
 
   void DebugPanel::Draw()
   {
@@ -40,8 +41,6 @@ namespace LPS
       {
         glfwSwapInterval(vsync ? 1 : 0);
       }
-      ImGui::Text("Thread Sleep Count (ms)");
-      ImGui::SliderInt("##b", &sleep_count, 0, 50);
       ImGui::Text("Field of View");
       ImGui::SliderFloat("##d", &fov, 1.0f, 360.0f);
       ImGui::Dummy(ImVec2{ 0.0f, 20.0f });

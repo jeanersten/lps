@@ -14,7 +14,6 @@ namespace LPS
     DebugPanel();
 
     bool visible;
-    int sleep_count;
     bool vsync;
     glm::vec3 clear_color;
     float view_z;
