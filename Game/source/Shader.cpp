@@ -63,6 +63,17 @@ namespace LPS
     glUseProgram(m_prog);
   }
 
+  void Shader::Unuse() const
+  {
+    GLint current_prog{ 0 };
+
+    glGetIntegerv(GL_CURRENT_PROGRAM, static_cast<GLint*>(&current_prog));
+    LPS_ASSERT(m_prog == current_prog,
+               "Call of Unuse after shader already switched");
+    glUseProgram(0);
+
+  }
+
   void Shader::CheckError(GLuint id, bool is_program) const
   {
     int status{ };
@@ -87,6 +98,14 @@ namespace LPS
         glGetProgramInfoLog(id, 1024, NULL, info_log);
         LPS_LOG_ERROR("{}", info_log);
       }
+    }
+  }
+
+  void Shader::CheckUniformExistence(GLint loc, std::string_view name) const
+  {
+    if (loc == -1)
+    {
+      LPS_LOG_ERROR("No uniform named {} in shader program!", name);
     }
   }
 }

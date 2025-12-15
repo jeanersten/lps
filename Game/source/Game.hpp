@@ -27,6 +27,7 @@ namespace LPS
 
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<DebugPanel> m_panel;
+
     std::unique_ptr<Object2D> m_rect;
     std::unique_ptr<Object3D> m_block;
 
@@ -34,10 +35,12 @@ namespace LPS
 
     enum UserKey
     {
-      KEY_UP,
-      KEY_DOWN,
+      KEY_FORWARD,
+      KEY_BACKWARD,
       KEY_LEFT,
       KEY_RIGHT,
+      KEY_UP,
+      KEY_DOWN,
       KEY_SIZE
     };
 

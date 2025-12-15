@@ -17,18 +17,29 @@ namespace LPS
 
     void Draw() override;
 
-  protected:
-    struct Vertex
+    inline glm::vec3 GetPosition() const
     {
-      glm::vec3 pos;
-      glm::vec4 color;
-      glm::vec2 tex_coords;
-    };
+      return m_position;
+    }
 
+    inline glm::vec4 GetColor() const
+    {
+      return m_color;
+    }
+
+  protected:
     GLuint m_vao;
     GLuint m_vbo;
     GLuint m_ebo;
     GLuint m_tex;
+
+    struct Vertex
+    {
+      glm::vec3 pos;
+      glm::vec3 normal;
+      glm::vec4 color;
+      glm::vec2 tex_coord;
+    };
 
     std::vector<Vertex> m_vertices;
     glm::vec3 m_position;

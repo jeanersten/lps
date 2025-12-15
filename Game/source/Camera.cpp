@@ -4,11 +4,11 @@
 namespace LPS
 {
   Camera::Camera(glm::vec2 size)
-    : m_pos(0.0f, 0.0f, 3.0f)
+    : m_pos(0.0f, 0.0f, 10.0f)
     , m_size(size)
-    , m_front(0.0f, 0.0f, 3.0f)
+    , m_front(0.0f, 0.0f, -1.0f)
     , m_up(0.0f, 1.0f, 0.0f)
-    , m_right(0.0f, 0.0f, 0.0f)
+    , m_right(1.0f, 0.0f, 0.0f)
     , m_yaw(-90.0f)
     , m_pitch(0.0f)
     , m_fov(45.0f)
@@ -31,16 +31,29 @@ namespace LPS
   {
     m_pos += m_front * speed;
   }
+
   void Camera::MoveBackward(float speed)
   {
     m_pos -= m_front * speed;
   }
+
   void Camera::MoveLeft(float speed)
   {
-    m_pos -= glm::normalize(glm::cross(m_front, m_up)) * speed;
+    m_pos -= m_right * speed;
   }
+
   void Camera::MoveRight(float speed)
   {
-    m_pos += glm::normalize(glm::cross(m_front, m_up)) * speed;
+    m_pos += m_right * speed;
+  }
+
+  void Camera::MoveUp(float speed)
+  {
+    m_pos += m_up * speed;
+  }
+
+  void Camera::MoveDown(float speed)
+  {
+    m_pos -= m_up * speed;
   }
 }

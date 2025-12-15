@@ -16,8 +16,8 @@ namespace LPS
     bool visible;
     bool vsync;
     glm::vec3 clear_color;
-    float view_z;
     float fov;
+    float cam_speed;
     VisibilityCallbackFunc visibility_callback;
 
     void Draw() override;

@@ -73,7 +73,7 @@ namespace LPS
 
     m_block = std::make_unique<Object3D>(
       glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
-      glm::vec3{ 0.5f, 0.5f, 0.5f },
+      glm::vec3{ 10.0f, 10.0f, 10.0f },
       glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
       "assets/image/Crow.jpg"
     );
@@ -145,28 +145,18 @@ namespace LPS
     float wnd_width{ static_cast<float>(m_window.GetWidth()) };
     float wnd_height{ static_cast<float>(m_window.GetHeight()) };
 
-    m_camera->Update();
     m_camera->SetSize(glm::vec2{ wnd_width, wnd_height });
     m_camera->SetFov(m_panel->fov);
-  }
+    m_camera->Update();
 
-  void Game::Render()
-  {
-    m_window.Draw(m_panel.get());
+    float cam_speed { m_panel->cam_speed * m_delta_time };
 
-    float time_elapsed{ static_cast<float>(glfwGetTime()) };
-
-    static Shader shader{ "assets/shader/vertex_shader.glsl",
-                          "assets/shader/fragment_shader.glsl" };
-
-    const float cam_speed { 2.5f * m_delta_time };
-
-    if (m_user_key[KEY_UP])
+    if (m_user_key[KEY_FORWARD])
     {
       m_camera->MoveForward(cam_speed);
     }
 
-    if (m_user_key[KEY_DOWN])
+    if (m_user_key[KEY_BACKWARD])
     {
       m_camera->MoveBackward(cam_speed);
     }
@@ -181,6 +171,23 @@ namespace LPS
       m_camera->MoveRight(cam_speed);
     }
 
+    if (m_user_key[KEY_UP])
+    {
+      m_camera->MoveUp(cam_speed);
+    }
+
+    if (m_user_key[KEY_DOWN])
+    {
+      m_camera->MoveDown(cam_speed);
+    }
+  }
+
+  void Game::Render()
+  {
+    m_window.Draw(m_panel.get());
+
+    float time_elapsed{ static_cast<float>(glfwGetTime()) };
+
     static glm::vec3 obj_pos[] = {
       glm::vec3{  0.0f,  0.0f,  00.0f },
       glm::vec3{  2.0f,  5.0f, -15.0f },
@@ -194,27 +201,57 @@ namespace LPS
       glm::vec3{ -1.3f,  1.0f, -01.5f }
     };
 
-    for (int i = 0; i < m_objects.size(); i++)
-    {
-      glm::mat4 model{ 1.0f };
-      float angle{ 20.0f * i };
+    static auto light = std::make_unique<Object3D>(
+      glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
+      glm::vec3{ 0.25f, 0.25f, 0.25f },
+      glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
+      ""
+    );
 
-      model = glm::translate(model, obj_pos[i]);
-      model = glm::rotate(model, glm::radians(angle),
-                          glm::vec3{ 1.0f, 0.3f, 0.5f });
-      model = glm::rotate(model, glm::radians(angle) * time_elapsed * 2,
-                          glm::vec3{ 0.3f, 0.5f, 0.8f });
+    static Shader lgt_shader{ "assets/shader/light_vertex.glsl",
+                              "assets/shader/light_fragment.glsl" };
 
-      shader.Use();
-      shader.SetUniformInt("u_Sampler", 0);
-      shader.SetUniformMat4f("u_Model", model);
-      shader.SetUniformMat4f("u_View", m_camera->GetViewMatrix());
-      shader.SetUniformMat4f("u_Projection", m_camera->GetProjectionMatrix());
+    glm::mat4 lgt_model{ 1.0f };
+    static glm::vec3 lgt_pos{ 1.2f, 1.0f, 2.0f };
 
-      m_window.Draw(m_objects[i].get());
-    }
+    lgt_model = glm::mat4(1.0f);
+    lgt_model = glm::translate(lgt_model, lgt_pos);
 
-    glUseProgram(0);
+    lgt_shader.Use();
+
+    lgt_shader.SetUniformMat4f("u_View", m_camera->GetViewMatrix());
+    lgt_shader.SetUniformMat4f("u_Projection", m_camera->GetProjectionMatrix());
+    lgt_shader.SetUniformMat4f("u_Model",lgt_model);
+
+    m_window.Draw(light.get());
+
+    lgt_shader.Unuse();
+
+    static auto object = std::make_unique<Object3D>(
+      glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
+      glm::vec3{ 0.5f, 0.5f, 0.5f },
+      glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
+      "assets/image/Crow.jpg"
+    );
+
+    static Shader obj_shader{ "assets/shader/object_vertex.glsl",
+                              "assets/shader/object_fragment.glsl" };
+
+    glm::mat4 obj_model{ 1.0f };
+
+    obj_shader.Use();
+
+    obj_shader.SetUniformMat4f("u_View", m_camera->GetViewMatrix());
+    obj_shader.SetUniformMat4f("u_Projection", m_camera->GetProjectionMatrix());
+    obj_shader.SetUniformMat4f("u_Model", obj_model);
+    obj_shader.SetUniformInt("u_Sampler", 0);
+    obj_shader.SetUniformVec3f("u_LightColor", light->GetColor());
+    obj_shader.SetUniformVec3f("u_LightPosition", lgt_pos);
+    obj_shader.SetUniformVec3f("u_ViewPosition", m_camera->GetPosition());
+
+    m_window.Draw(object.get());
+
+    obj_shader.Unuse();
   }
 
   void Game::HandleKeyboard(int code, int action)
@@ -234,27 +271,38 @@ namespace LPS
       switch (code)
       {
         case GLFW_KEY_W:
-        case GLFW_KEY_UP:
         {
-          m_user_key[KEY_UP] = true;
+          m_user_key[KEY_FORWARD] = true;
         } break;
 
         case GLFW_KEY_S:
-        case GLFW_KEY_DOWN:
         {
-          m_user_key[KEY_DOWN] = true;
+          m_user_key[KEY_BACKWARD] = true;
         } break;
 
         case GLFW_KEY_A:
-        case GLFW_KEY_LEFT:
         {
           m_user_key[KEY_LEFT] = true;
         } break;
 
         case GLFW_KEY_D:
-        case GLFW_KEY_RIGHT:
         {
           m_user_key[KEY_RIGHT] = true;
+        } break;
+
+        case GLFW_KEY_UP:
+        {
+          m_user_key[KEY_UP] = true;
+        } break;
+
+        case GLFW_KEY_DOWN:
+        {
+          m_user_key[KEY_DOWN] = true;
+        } break;
+
+        default:
+        {
+          ;
         } break;
       }
     }
@@ -264,27 +312,38 @@ namespace LPS
       switch (code)
       {
         case GLFW_KEY_W:
-        case GLFW_KEY_UP:
         {
-          m_user_key[KEY_UP] = false;
+          m_user_key[KEY_FORWARD] = false;
         } break;
 
         case GLFW_KEY_S:
-        case GLFW_KEY_DOWN:
         {
-          m_user_key[KEY_DOWN] = false;
+          m_user_key[KEY_BACKWARD] = false;
         } break;
 
         case GLFW_KEY_A:
-        case GLFW_KEY_LEFT:
         {
           m_user_key[KEY_LEFT] = false;
         } break;
 
         case GLFW_KEY_D:
-        case GLFW_KEY_RIGHT:
         {
           m_user_key[KEY_RIGHT] = false;
+        } break;
+
+        case GLFW_KEY_UP:
+        {
+          m_user_key[KEY_UP] = false;
+        } break;
+
+        case GLFW_KEY_DOWN:
+        {
+          m_user_key[KEY_DOWN] = false;
+        } break;
+
+        default:
+        {
+          ;
         } break;
       }
     }

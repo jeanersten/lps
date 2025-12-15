@@ -8,6 +8,8 @@ namespace LPS
                      const std::filesystem::path& path)
     : m_vao(0)
     , m_vbo(0)
+    , m_ebo(0)
+    , m_tex(0)
     , m_vertices()
     , m_position(position)
     , m_size(size)
@@ -50,7 +52,7 @@ namespace LPS
                           (GLvoid*)offsetof(Vertex, color));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (GLvoid*)offsetof(Vertex, tex_coords));
+                          (GLvoid*)offsetof(Vertex, tex_coord));
     glEnableVertexAttribArray(2);
 
     glBindTexture(GL_TEXTURE_2D, m_tex);
@@ -71,12 +73,34 @@ namespace LPS
     GLubyte* data{ stbi_load(std::filesystem::absolute(path).string().c_str(),
                              &tex_width, &tex_height, nullptr, 3) };
 
-    LPS_ASSERT(data != nullptr, "Failed to load texture from file.");
+    if (data != nullptr)
+    {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0,
+                   GL_RGB, GL_UNSIGNED_BYTE, data);
+      glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
+      stbi_image_free(data);
+    }
+    else
+    {
+      GLubyte red = static_cast<GLubyte>(
+        std::clamp(m_color.r, 0.0f, 1.0f) * 255.0f
+      );
+
+      GLubyte green = static_cast<GLubyte>(
+        std::clamp(m_color.g, 0.0f, 1.0f) * 255.0f
+      );
+
+      GLubyte blue = static_cast<GLubyte>(
+        std::clamp(m_color.b, 0.0f, 1.0f) * 255.0f
+      );
+
+      GLubyte fallback_color[3] { red, green, blue };
+
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0,
+                   GL_RGB, GL_UNSIGNED_BYTE, fallback_color);
+      glGenerateMipmap(GL_TEXTURE_2D);
+    }
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

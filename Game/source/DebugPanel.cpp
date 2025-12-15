@@ -7,8 +7,8 @@ namespace LPS
     : visible(true)
     , vsync(true)
     , clear_color(0.2f, 0.2f, 0.2f)
-    , view_z(5.0f)
     , fov(45.0f)
+    , cam_speed(10.0f)
     , visibility_callback()
   {
     glfwSwapInterval(vsync ? 1 : 0);
@@ -43,6 +43,8 @@ namespace LPS
       }
       ImGui::Text("Field of View");
       ImGui::SliderFloat("##d", &fov, 1.0f, 360.0f);
+      ImGui::Text("Camera Speed");
+      ImGui::SliderFloat("##e", &cam_speed, 1.0f, 50.0f);
       ImGui::Dummy(ImVec2{ 0.0f, 20.0f });
 
       ImGui::End();

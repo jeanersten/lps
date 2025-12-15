@@ -18,6 +18,8 @@ namespace LPS
     void MoveBackward(float speed);
     void MoveLeft(float speed);
     void MoveRight(float speed);
+    void MoveUp(float speed);
+    void MoveDown(float speed);
 
     inline glm::mat4 GetViewMatrix() const
     {
@@ -27,7 +29,12 @@ namespace LPS
     inline glm::mat4 GetProjectionMatrix() const
     {
       return glm::perspective(glm::radians(m_fov), m_size.x / m_size.y,
-                              0.1f, 100.0f);
+                              0.1f, 1000.0f);
+    }
+
+    inline glm::vec3 GetPosition() const
+    {
+      return m_pos;
     }
 
     inline void SetSize(glm::vec2 val)
