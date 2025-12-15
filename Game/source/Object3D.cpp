@@ -15,6 +15,7 @@ namespace LPS
     , m_position(position)
     , m_size(size)
     , m_color(color)
+    , m_frame_mode(false)
   {
     m_vertices.reserve(24);
 
@@ -179,6 +180,7 @@ namespace LPS
     , m_position(position)
     , m_size(size)
     , m_color(color)
+    , m_frame_mode(false)
   {
     std::vector<glm::vec3> positions{ };
     std::vector<glm::vec3> normals{ };
@@ -376,7 +378,7 @@ namespace LPS
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_tex);
     glBindVertexArray(m_vao);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, m_frame_mode ? GL_LINE : GL_FILL);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
                    GL_UNSIGNED_INT, 0);
   }

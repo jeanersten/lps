@@ -30,6 +30,11 @@ namespace LPS
       return m_color;
     }
 
+    inline void SetDrawFrameMode(bool val)
+    {
+      m_frame_mode = val;
+    }
+
   protected:
     GLuint m_vao;
     GLuint m_vbo;
@@ -49,5 +54,7 @@ namespace LPS
     glm::vec3 m_position;
     glm::vec3 m_size;
     glm::vec4 m_color;
+
+    bool m_frame_mode;
   };
 }

@@ -15,6 +15,7 @@ namespace LPS
 
     bool visible;
     bool vsync;
+    bool frame_mode;
     glm::vec3 clear_color;
     float fov;
     float cam_speed;

@@ -6,6 +6,7 @@ namespace LPS
   DebugPanel::DebugPanel()
     : visible(true)
     , vsync(true)
+    , frame_mode(false)
     , clear_color(0.2f, 0.2f, 0.2f)
     , fov(45.0f)
     , cam_speed(10.0f)
@@ -36,11 +37,12 @@ namespace LPS
       ImGui::Text("Clear Color");
       ImGui::ColorEdit3("##a", (float*)&clear_color);
       ImGui::Dummy(ImVec2{ 0.0f, 20.0f });
-      ImGui::Text("Vsync");
       if (ImGui::Checkbox("Vsync", &vsync))
       {
         glfwSwapInterval(vsync ? 1 : 0);
       }
+      ImGui::Checkbox("Frame Mode", &frame_mode);
+      ImGui::Dummy(ImVec2{ 0.0f, 20.0f });
       ImGui::Text("Field of View");
       ImGui::SliderFloat("##d", &fov, 1.0f, 360.0f);
       ImGui::Text("Camera Speed");

@@ -235,6 +235,8 @@ namespace LPS
       ""
     );
 
+    object->SetDrawFrameMode(m_panel->frame_mode);
+
     static Shader obj_shader{ "assets/shader/object_vertex.glsl",
                               "assets/shader/object_fragment.glsl" };
 
