@@ -231,7 +231,8 @@ namespace LPS
       glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
       glm::vec3{ 0.5f, 0.5f, 0.5f },
       glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
-      "assets/image/Crow.jpg"
+      "assets/model/Sphere.obj",
+      ""
     );
 
     static Shader obj_shader{ "assets/shader/object_vertex.glsl",

@@ -13,6 +13,9 @@ namespace LPS
   public:
     Object3D(glm::vec3 position, glm::vec3 size, glm::vec4 color,
              const std::filesystem::path& texture_path);
+    Object3D(glm::vec3 position, glm::vec3 size, glm::vec4 color,
+             const std::filesystem::path& model_path,
+             const std::filesystem::path& texture_path);
     virtual ~Object3D();
 
     void Draw() override;
@@ -42,6 +45,7 @@ namespace LPS
     };
 
     std::vector<Vertex> m_vertices;
+    std::vector<GLuint> m_indices;
     glm::vec3 m_position;
     glm::vec3 m_size;
     glm::vec4 m_color;
