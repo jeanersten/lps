@@ -1,9 +1,10 @@
 #include "LPSPCH.hpp"
-#include "Log.hpp"
+#include "Ball.hpp"
+#include "Camera.hpp"
 #include "Game.hpp"
-#include "Object2D.hpp"
-#include "Object3D.hpp"
-#include "Shader.hpp"
+#include "DebugPanel.hpp"
+#include "Light.hpp"
+#include "Window.hpp"
 
 namespace LPS
 {
@@ -13,9 +14,8 @@ namespace LPS
     , m_delta_time(0.0f)
     , m_camera(nullptr)
     , m_panel(nullptr)
-    , m_rect(nullptr)
-    , m_block(nullptr)
-    , m_objects()
+    , m_light(nullptr)
+    , m_ball(nullptr)
     , m_user_key(false)
     , m_first_mouse(true)
   {
@@ -64,33 +64,9 @@ namespace LPS
       HandlePanelVisibility(visible);
     };
 
-    m_rect = std::make_unique<Object2D>(
-      glm::vec2{ 0.0f, 0.0f }, // Not currently used
-      glm::vec2{ 0.5f, 0.5f },
-      glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
-      "assets/image/Crow.jpg"
-    );
+    m_light = std::make_unique<Light>(m_camera.get());
 
-    m_block = std::make_unique<Object3D>(
-      glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
-      glm::vec3{ 10.0f, 10.0f, 10.0f },
-      glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
-      "assets/image/Crow.jpg"
-    );
-
-    size_t object_count { 10 };
-
-    m_objects.reserve(object_count);
-
-    for (size_t i = 0; i < object_count; i++)
-    {
-      m_objects.push_back(std::make_unique<Object3D>(
-        glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
-        glm::vec3{ 0.5f, 0.5f, 0.5f },
-        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
-        "assets/image/Crow.jpg"
-      ));
-    }
+    m_ball = std::make_unique<Ball>(m_camera.get(), m_light.get());
   }
 
   Game::~Game()
@@ -184,77 +160,13 @@ namespace LPS
 
   void Game::Render()
   {
-    m_window.Draw(m_panel.get());
-
     float time_elapsed{ static_cast<float>(glfwGetTime()) };
 
-    static glm::vec3 obj_pos[] = {
-      glm::vec3{  0.0f,  0.0f,  00.0f },
-      glm::vec3{  2.0f,  5.0f, -15.0f },
-      glm::vec3{ -1.5f, -2.2f, -02.5f },
-      glm::vec3{ -3.8f, -2.0f, -12.3f },
-      glm::vec3{  2.4f, -0.4f, -03.5f },
-      glm::vec3{ -1.7f,  3.0f, -07.5f },
-      glm::vec3{  1.3f, -2.0f, -02.5f },
-      glm::vec3{  1.5f,  2.0f, -02.5f },
-      glm::vec3{  1.5f,  0.2f, -01.5f },
-      glm::vec3{ -1.3f,  1.0f, -01.5f }
-    };
+    m_window.Draw(m_panel.get());
+    m_window.Draw(m_light.get());
+    m_window.Draw(m_ball.get());
 
-    static auto light = std::make_unique<Object3D>(
-      glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
-      glm::vec3{ 0.25f, 0.25f, 0.25f },
-      glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
-      ""
-    );
-
-    static Shader lgt_shader{ "assets/shader/light_vertex.glsl",
-                              "assets/shader/light_fragment.glsl" };
-
-    glm::mat4 lgt_model{ 1.0f };
-    static glm::vec3 lgt_pos{ 1.2f, 1.0f, 2.0f };
-
-    lgt_model = glm::mat4(1.0f);
-    lgt_model = glm::translate(lgt_model, lgt_pos);
-
-    lgt_shader.Use();
-
-    lgt_shader.SetUniformMat4f("u_View", m_camera->GetViewMatrix());
-    lgt_shader.SetUniformMat4f("u_Projection", m_camera->GetProjectionMatrix());
-    lgt_shader.SetUniformMat4f("u_Model",lgt_model);
-
-    m_window.Draw(light.get());
-
-    lgt_shader.Unuse();
-
-    static auto object = std::make_unique<Object3D>(
-      glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
-      glm::vec3{ 0.5f, 0.5f, 0.5f },
-      glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
-      "assets/model/Sphere.obj",
-      ""
-    );
-
-    object->SetDrawFrameMode(m_panel->frame_mode);
-
-    static Shader obj_shader{ "assets/shader/object_vertex.glsl",
-                              "assets/shader/object_fragment.glsl" };
-
-    glm::mat4 obj_model{ 1.0f };
-
-    obj_shader.Use();
-
-    obj_shader.SetUniformMat4f("u_View", m_camera->GetViewMatrix());
-    obj_shader.SetUniformMat4f("u_Projection", m_camera->GetProjectionMatrix());
-    obj_shader.SetUniformMat4f("u_Model", obj_model);
-    obj_shader.SetUniformInt("u_Sampler", 0);
-    obj_shader.SetUniformVec3f("u_LightColor", light->GetColor());
-    obj_shader.SetUniformVec3f("u_LightPosition", lgt_pos);
-    obj_shader.SetUniformVec3f("u_ViewPosition", m_camera->GetPosition());
-
-    m_window.Draw(object.get());
-
-    obj_shader.Unuse();
+    m_ball->SetDrawFrameMode(m_panel->frame_mode);
   }
 
   void Game::HandleKeyboard(int code, int action)

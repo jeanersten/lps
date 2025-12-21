@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Ball.hpp"
 #include "Camera.hpp"
 #include "DebugPanel.hpp"
-#include "Object2D.hpp"
-#include "Object3D.hpp"
+#include "Light.hpp"
 #include "Window.hpp"
 #include <memory>
 #include <vector>
@@ -27,11 +27,8 @@ namespace LPS
 
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<DebugPanel> m_panel;
-
-    std::unique_ptr<Object2D> m_rect;
-    std::unique_ptr<Object3D> m_block;
-
-    std::vector<std::unique_ptr<Object3D>> m_objects;
+    std::unique_ptr<Light> m_light;
+    std::unique_ptr<Ball> m_ball;
 
     enum UserKey
     {

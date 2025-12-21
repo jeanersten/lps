@@ -8,6 +8,8 @@ add_subdirectory("vendor/imgui-1.92.5")
 add_subdirectory("vendor/stbimage-2.30.0")
 
 add_executable(Game
+  "source/Ball.cpp"
+  "source/Ball.hpp"
   "source/Camera.cpp"
   "source/Camera.hpp"
   "source/DebugPanel.cpp"
@@ -15,6 +17,8 @@ add_executable(Game
   "source/Game.cpp"
   "source/Game.hpp"
   "source/Interface.hpp"
+  "source/Light.cpp"
+  "source/Light.hpp"
   "source/Log.cpp"
   "source/Log.hpp"
   "source/Main.cpp"
