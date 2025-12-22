@@ -379,7 +379,6 @@ namespace LPS
     glBindTexture(GL_TEXTURE_2D, m_tex);
     glBindVertexArray(m_vao);
     glPolygonMode(GL_FRONT_AND_BACK, m_frame_mode ? GL_LINE : GL_FILL);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
-                   GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
   }
 }

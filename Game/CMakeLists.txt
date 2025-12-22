@@ -16,6 +16,8 @@ add_executable(Game
   "source/DebugPanel.hpp"
   "source/Game.cpp"
   "source/Game.hpp"
+  "source/Grid.cpp"
+  "source/Grid.hpp"
   "source/Interface.hpp"
   "source/Light.cpp"
   "source/Light.hpp"

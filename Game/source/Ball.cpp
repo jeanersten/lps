@@ -1,12 +1,14 @@
 #include "LPSPCH.hpp"
 #include "Ball.hpp"
+#include "Camera.hpp"
+#include "Light.hpp"
 #include "Object3D.hpp"
 
 namespace LPS
 {
   Ball::Ball(const Camera* camera, const Light* light)
     : Object3D(
-        glm::vec3{ 0.0f, 0.0f, 0.0f }, // Not currently used
+        glm::vec3{ 0.0f, 1.0f, 0.0f },
         glm::vec3{ 0.5f, 0.5f, 0.5f },
         glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
         "assets/model/Sphere.obj",

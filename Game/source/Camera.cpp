@@ -4,13 +4,13 @@
 namespace LPS
 {
   Camera::Camera(glm::vec2 size)
-    : m_pos(0.0f, 0.0f, 10.0f)
+    : m_pos(0.0f, 5.0f, 5.0f)
     , m_size(size)
     , m_front(0.0f, 0.0f, -1.0f)
     , m_up(0.0f, 1.0f, 0.0f)
     , m_right(1.0f, 0.0f, 0.0f)
     , m_yaw(-90.0f)
-    , m_pitch(0.0f)
+    , m_pitch(-45.0f)
     , m_fov(45.0f)
   {}
 

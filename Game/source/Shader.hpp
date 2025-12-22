@@ -32,7 +32,7 @@ namespace LPS
 
       CheckUniformExistence(uniform_loc, name);
 
-      glUniform3f(uniform_loc, val.x, val.y, val.z);
+      glUniform3fv(uniform_loc, 1, glm::value_ptr(val));
     }
 
     inline void SetUniformVec4f(std::string_view name,
@@ -52,7 +52,7 @@ namespace LPS
 
       CheckUniformExistence(uniform_loc, name);
 
-      glUniform4f(uniform_loc, val.x, val.y, val.z, val.w);
+      glUniform4fv(uniform_loc, 1, glm::value_ptr(val));
     }
 
     inline void SetUniformMat4f(std::string_view name, glm::mat4 mat) const
@@ -71,6 +71,15 @@ namespace LPS
       CheckUniformExistence(uniform_loc, name);
 
       glUniform1i(uniform_loc, val);
+    }
+
+    inline void SetUniformFloat(std::string_view name, float val) const
+    {
+      int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };
+
+      CheckUniformExistence(uniform_loc, name);
+
+      glUniform1f(uniform_loc, val);
     }
 
   private:

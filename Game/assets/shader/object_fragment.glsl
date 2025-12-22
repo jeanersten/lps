@@ -3,7 +3,7 @@
 in vec3 Position;
 in vec3 Normal;
 in vec4 Color;
-in vec2 TexCoords;
+in vec2 TexCoord;
 
 out vec4 FragColor;
 
@@ -30,7 +30,7 @@ void main()
 
   vec3 lighting = (ambient + diffuse + specular);
 
-  vec3 albedo = vec3(texture(u_Sampler, TexCoords).rgb * Color.rgb);
+  vec3 albedo = vec3(texture(u_Sampler, TexCoord).rgb * Color.rgb);
 
   FragColor = vec4(albedo * lighting, Color.a);
 }

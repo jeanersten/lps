@@ -1,4 +1,5 @@
 #include "LPSPCH.hpp"
+#include "Camera.hpp"
 #include "Light.hpp"
 #include "Object3D.hpp"
 

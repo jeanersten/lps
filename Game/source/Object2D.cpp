@@ -4,16 +4,18 @@
 
 namespace LPS
 {
-  Object2D::Object2D(glm::vec2 position, glm::vec2 size, glm::vec4 color,
+  Object2D::Object2D(glm::vec3 position, glm::vec2 size, glm::vec4 color,
                      const std::filesystem::path& path)
     : m_vao(0)
     , m_vbo(0)
     , m_ebo(0)
     , m_tex(0)
     , m_vertices()
+    , m_indices()
     , m_position(position)
     , m_size(size)
     , m_color(color)
+    , m_frame_mode(false)
   {
     m_vertices.reserve(4);
 
@@ -33,6 +35,15 @@ namespace LPS
       2, 1, 3
     };
 
+    size_t indices_size{ sizeof(indices) / sizeof(GLuint) };
+
+    m_vertices.reserve(indices_size);
+
+    for (int i = 0; i < indices_size; i++)
+    {
+      m_indices.push_back(indices[i]);
+    }
+
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
     glGenBuffers(1, &m_ebo);
@@ -44,7 +55,7 @@ namespace LPS
                  m_vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices),
-                 indices, GL_STATIC_DRAW);
+                 m_indices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (GLvoid*)0);
     glEnableVertexAttribArray(0);
@@ -120,6 +131,7 @@ namespace LPS
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_tex);
     glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glPolygonMode(GL_FRONT_AND_BACK, m_frame_mode ? GL_LINE : GL_FILL);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
   }
 }

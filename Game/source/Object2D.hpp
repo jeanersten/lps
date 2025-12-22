@@ -11,11 +11,16 @@ namespace LPS
   class Object2D : public IDrawable
   {
   public:
-    Object2D(glm::vec2 position, glm::vec2 size, glm::vec4 color,
+    Object2D(glm::vec3 position, glm::vec2 size, glm::vec4 color,
              const std::filesystem::path& texture_path);
     virtual ~Object2D();
 
     void Draw() override;
+
+    inline void SetDrawFrameMode(bool val)
+    {
+      m_frame_mode = val;
+    }
 
   protected:
     GLuint m_vao;
@@ -31,8 +36,11 @@ namespace LPS
     };
 
     std::vector<Vertex> m_vertices;
-    glm::vec2 m_position;
+    std::vector<GLuint> m_indices;
+    glm::vec3 m_position;
     glm::vec2 m_size;
     glm::vec4 m_color;
+
+    bool m_frame_mode;
   };
 }

@@ -2,6 +2,7 @@
 #include "Ball.hpp"
 #include "Camera.hpp"
 #include "Game.hpp"
+#include "Grid.hpp"
 #include "DebugPanel.hpp"
 #include "Light.hpp"
 #include "Window.hpp"
@@ -16,6 +17,7 @@ namespace LPS
     , m_panel(nullptr)
     , m_light(nullptr)
     , m_ball(nullptr)
+    , m_grid(nullptr)
     , m_user_key(false)
     , m_first_mouse(true)
   {
@@ -58,15 +60,14 @@ namespace LPS
     float wnd_height{ static_cast<float>(m_window.GetHeight()) };
 
     m_camera = std::make_unique<Camera>(glm::vec2{ wnd_width, wnd_height });
-
     m_panel = std::make_unique<DebugPanel>();
-    m_panel->visibility_callback = [this](bool visible) -> void{
+    m_light = std::make_unique<Light>(m_camera.get());
+    m_ball = std::make_unique<Ball>(m_camera.get(), m_light.get());
+    m_grid = std::make_unique<Grid>(m_camera.get());
+
+    m_panel->visibility_callback = [this](bool visible) -> void {
       HandlePanelVisibility(visible);
     };
-
-    m_light = std::make_unique<Light>(m_camera.get());
-
-    m_ball = std::make_unique<Ball>(m_camera.get(), m_light.get());
   }
 
   Game::~Game()
@@ -89,9 +90,10 @@ namespace LPS
         continue;
       }
 
+      glDisable(GL_CULL_FACE);
+      glEnable(GL_DEPTH_TEST);
       glClearColor(m_panel->clear_color.r, m_panel->clear_color.g,
                    m_panel->clear_color.b, 1.0f);
-      glEnable(GL_DEPTH_TEST);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       ImGui_ImplOpenGL3_NewFrame();
@@ -160,13 +162,13 @@ namespace LPS
 
   void Game::Render()
   {
-    float time_elapsed{ static_cast<float>(glfwGetTime()) };
-
     m_window.Draw(m_panel.get());
     m_window.Draw(m_light.get());
     m_window.Draw(m_ball.get());
+    m_window.Draw(m_grid.get());
 
     m_ball->SetDrawFrameMode(m_panel->frame_mode);
+    m_grid->SetDrawFrameMode(m_panel->frame_mode);
   }
 
   void Game::HandleKeyboard(int code, int action)
@@ -269,7 +271,7 @@ namespace LPS
     if (m_panel->visible) return;
 
     static float yaw{ -90.0f };
-    static float pitch{  0.0f };
+    static float pitch{ -45.0f };
     static float last_mouse_x{ m_window.GetWidth() / 2.0f };
     static float last_mouse_y{ m_window.GetHeight() / 2.0f };
     float mouse_x{ static_cast<float>(xpos) };

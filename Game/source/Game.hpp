@@ -3,6 +3,7 @@
 #include "Ball.hpp"
 #include "Camera.hpp"
 #include "DebugPanel.hpp"
+#include "Grid.hpp"
 #include "Light.hpp"
 #include "Window.hpp"
 #include <memory>
@@ -29,6 +30,7 @@ namespace LPS
     std::unique_ptr<DebugPanel> m_panel;
     std::unique_ptr<Light> m_light;
     std::unique_ptr<Ball> m_ball;
+    std::unique_ptr<Grid> m_grid;
 
     enum UserKey
     {
