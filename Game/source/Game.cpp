@@ -91,9 +91,11 @@ namespace LPS
       }
 
       glDisable(GL_CULL_FACE);
+      glEnable(GL_BLEND);
       glEnable(GL_DEPTH_TEST);
       glClearColor(m_panel->clear_color.r, m_panel->clear_color.g,
                    m_panel->clear_color.b, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       ImGui_ImplOpenGL3_NewFrame();

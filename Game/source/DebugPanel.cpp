@@ -7,7 +7,7 @@ namespace LPS
     : visible(true)
     , vsync(true)
     , frame_mode(false)
-    , clear_color(0.2f, 0.2f, 0.2f)
+    , clear_color(0.0f, 0.0f, 0.0f)
     , fov(45.0f)
     , cam_speed(10.0f)
     , visibility_callback()

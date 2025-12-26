@@ -16,6 +16,25 @@ namespace LPS
     void Use() const;
     void Unuse() const;
 
+    inline void SetUniformVec2f(std::string_view name,
+      float val0, float val1) const
+    {
+      int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };
+
+      CheckUniformExistence(uniform_loc, name);
+
+      glUniform2f(uniform_loc, val0, val1);
+    }
+
+    inline void SetUniformVec2f(std::string_view name, glm::vec2 val) const
+    {
+      int uniform_loc{ glGetUniformLocation(m_prog, name.data()) };
+
+      CheckUniformExistence(uniform_loc, name);
+
+      glUniform2fv(uniform_loc, 1, glm::value_ptr(val));
+    }
+
     inline void SetUniformVec3f(std::string_view name,
                                 float val0, float val1, float val2) const
     {
