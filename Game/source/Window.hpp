@@ -62,6 +62,21 @@ namespace LPS
       stbi_image_free(image.pixels);
     }
 
+    inline void Maximize()
+    {
+      glfwMaximizeWindow(m_object);
+    }
+
+    inline void SetPosition(glm::vec2 val)
+    {
+      glfwSetWindowPos(m_object, val.x, val.y);
+    }
+
+    inline void SetSize(glm::vec2 val)
+    {
+      glfwSetWindowSize(m_object, val.x, val.y);
+    }
+
     inline void SetKeyCallback(KeyCallbackFunc callback)
     {
       m_key_callback = callback;

@@ -4,7 +4,9 @@
 #include "Camera.hpp"
 #include "DebugPanel.hpp"
 #include "Grid.hpp"
+#include "InfoPanel.hpp"
 #include "Light.hpp"
+#include "PlaybackPanel.hpp"
 #include "Window.hpp"
 #include <memory>
 #include <vector>
@@ -24,11 +26,15 @@ namespace LPS
     bool m_running;
     Window m_window;
 
+    float m_time;
     float m_delta_time;
 
     std::unique_ptr<Camera> m_camera;
-    std::unique_ptr<DebugPanel> m_panel;
-    std::unique_ptr<Light> m_light;
+    std::unique_ptr<InfoPanel> m_info_panel;
+    std::unique_ptr<DebugPanel> m_debug_panel;
+    std::unique_ptr<PlaybackPanel> m_playback_panel;
+    std::unique_ptr<Light> m_llight;
+    std::unique_ptr<Light> m_rlight;
     std::unique_ptr<Ball> m_ball;
     std::unique_ptr<Grid> m_grid;
 

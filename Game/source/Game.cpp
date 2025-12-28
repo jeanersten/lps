@@ -1,21 +1,25 @@
 #include "LPSPCH.hpp"
 #include "Ball.hpp"
 #include "Camera.hpp"
+#include "DebugPanel.hpp"
 #include "Game.hpp"
 #include "Grid.hpp"
-#include "DebugPanel.hpp"
+#include "InfoPanel.hpp"
 #include "Light.hpp"
-#include "Window.hpp"
+#include "PlaybackPanel.hpp"
 
 namespace LPS
 {
   Game::Game()
     : m_running(true)
     , m_window(640, 480, "Little Physics Simulation")
+    , m_time(0.0f)
     , m_delta_time(0.0f)
     , m_camera(nullptr)
-    , m_panel(nullptr)
-    , m_light(nullptr)
+    , m_debug_panel(nullptr)
+    , m_playback_panel(nullptr)
+    , m_llight(nullptr)
+    , m_rlight(nullptr)
     , m_ball(nullptr)
     , m_grid(nullptr)
     , m_user_key(false)
@@ -60,14 +64,24 @@ namespace LPS
     float wnd_height{ static_cast<float>(m_window.GetHeight()) };
 
     m_camera = std::make_unique<Camera>(glm::vec2{ wnd_width, wnd_height });
-    m_panel = std::make_unique<DebugPanel>();
-    m_light = std::make_unique<Light>(m_camera.get());
-    m_ball = std::make_unique<Ball>(m_camera.get(), m_light.get());
+    m_info_panel = std::make_unique<InfoPanel>();
+    m_debug_panel = std::make_unique<DebugPanel>();
+    m_playback_panel = std::make_unique<PlaybackPanel>();
+    m_llight = std::make_unique<Light>(m_camera.get());
+    m_rlight = std::make_unique<Light>(m_camera.get());
+    m_ball = std::make_unique<Ball>(
+      m_camera.get(), std::vector<Light*>{ m_llight.get(), m_rlight.get() }
+    );
     m_grid = std::make_unique<Grid>(m_camera.get());
 
-    m_panel->visibility_callback = [this](bool visible) -> void {
+    m_debug_panel->cam = m_camera.get();
+    m_debug_panel->visibility_callback = [this](bool visible) -> void {
       HandlePanelVisibility(visible);
     };
+
+    m_ball->debug_panel = m_debug_panel.get();
+
+    m_window.Maximize();
   }
 
   Game::~Game()
@@ -93,8 +107,8 @@ namespace LPS
       glDisable(GL_CULL_FACE);
       glEnable(GL_BLEND);
       glEnable(GL_DEPTH_TEST);
-      glClearColor(m_panel->clear_color.r, m_panel->clear_color.g,
-                   m_panel->clear_color.b, 1.0f);
+      glClearColor(m_debug_panel->clear_color.r, m_debug_panel->clear_color.g,
+                   m_debug_panel->clear_color.b, 1.0f);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -116,20 +130,26 @@ namespace LPS
 
   void Game::Update()
   {
-    float cf_time{ static_cast<float>(glfwGetTime()) };
+    m_time = static_cast<float>(glfwGetTime());
+
+    float cf_time{ m_time };
     static float lf_time{ 0.f };
 
     m_delta_time = cf_time - lf_time;
     lf_time = cf_time;
 
+    m_info_panel->running_time = m_time;
+    m_info_panel->view_pos = m_camera->GetPosition();
+    m_playback_panel->left_padding = m_debug_panel->GetSize().x;
+
     float wnd_width{ static_cast<float>(m_window.GetWidth()) };
     float wnd_height{ static_cast<float>(m_window.GetHeight()) };
 
     m_camera->SetSize(glm::vec2{ wnd_width, wnd_height });
-    m_camera->SetFov(m_panel->fov);
+    m_camera->SetFov(m_debug_panel->cam_fov);
     m_camera->Update();
 
-    float cam_speed { m_panel->cam_speed * m_delta_time };
+    float cam_speed { m_debug_panel->cam_speed * m_delta_time };
 
     if (m_user_key[KEY_FORWARD])
     {
@@ -160,22 +180,38 @@ namespace LPS
     {
       m_camera->MoveDown(cam_speed);
     }
+
+    glm::vec3 lrot{
+      m_ball->GetPosition().x + glm::cos(m_time) *
+        m_debug_panel->rot_light_dist,
+      m_ball->GetPosition().y,
+      m_ball->GetPosition().z + glm::sin(m_time) *
+        m_debug_panel->rot_light_dist
+    };
+
+    m_llight->SetPosition(glm::vec3{ lrot.x, lrot.y, lrot.z });
+    m_rlight->SetPosition(glm::vec3{ -lrot.x, lrot.y, -lrot.z });
   }
 
   void Game::Render()
   {
-    m_window.Draw(m_panel.get());
-    m_window.Draw(m_light.get());
+    m_window.Draw(m_info_panel.get());
+    m_window.Draw(m_debug_panel.get());
+    m_window.Draw(m_playback_panel.get());
+    m_window.Draw(m_llight.get());
+    m_window.Draw(m_rlight.get());
     m_window.Draw(m_ball.get());
     m_window.Draw(m_grid.get());
 
-    m_ball->SetDrawFrameMode(m_panel->frame_mode);
-    m_grid->SetDrawFrameMode(m_panel->frame_mode);
+    m_llight->SetDrawFrameMode(m_debug_panel->frame_mode);
+    m_rlight->SetDrawFrameMode(m_debug_panel->frame_mode);
+    m_ball->SetDrawFrameMode(m_debug_panel->frame_mode);
+    m_grid->SetDrawFrameMode(m_debug_panel->frame_mode);
   }
 
   void Game::HandleKeyboard(int code, int action)
   {
-    if (m_panel->visible)
+    if (m_debug_panel->visible)
     {
       for (size_t i = 0; i < KEY_SIZE; i++)
       {
@@ -270,7 +306,7 @@ namespace LPS
 
   void Game::HandleMouse(double xpos, double ypos)
   {
-    if (m_panel->visible) return;
+    if (m_debug_panel->visible) return;
 
     static float yaw{ -90.0f };
     static float pitch{ -45.0f };
@@ -307,12 +343,12 @@ namespace LPS
 
   void Game::HandleScroll(double xoffset, double yoffset)
   {
-    if (m_panel->visible) return;
+    if (m_debug_panel->visible) return;
 
-    m_panel->fov -= static_cast<float>(yoffset);
+    m_debug_panel->cam_fov -= static_cast<float>(yoffset);
 
-    if (m_panel->fov < 1.0f) m_panel->fov = 1.0f;
-    if (m_panel->fov > 360.0f) m_panel->fov = 360.0f;
+    if (m_debug_panel->cam_fov < 1.0f) m_debug_panel->cam_fov = 1.0f;
+    if (m_debug_panel->cam_fov > 360.0f) m_debug_panel->cam_fov = 360.0f;
   }
 
   void Game::HandlePanelVisibility(bool visible)

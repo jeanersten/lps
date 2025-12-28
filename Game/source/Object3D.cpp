@@ -10,9 +10,12 @@ namespace LPS
     , m_vbo(0)
     , m_ebo(0)
     , m_tex(0)
+    , m_position(position)
+    , m_rotation(0.0f, 0.0f, 0.0f)
+    , m_scale(1.0f, 1.0f, 1.0f)
+    , m_model(1.0f)
     , m_vertices()
     , m_indices()
-    , m_position(position)
     , m_size(size)
     , m_color(color)
     , m_frame_mode(false)
@@ -175,9 +178,12 @@ namespace LPS
     , m_vbo(0)
     , m_ebo(0)
     , m_tex(0)
+    , m_position(position)
+    , m_rotation(0.0f, 0.0f, 0.0f)
+    , m_scale(1.0f, 1.0f, 1.0f)
+    , m_model(1.0f)
     , m_vertices()
     , m_indices()
-    , m_position(position)
     , m_size(size)
     , m_color(color)
     , m_frame_mode(false)
@@ -204,7 +210,7 @@ namespace LPS
         stream >> pos.y;
         stream >> pos.z;
 
-        positions.push_back(pos);
+        positions.push_back(pos * m_size);
       }
       else if (line.substr(0, 2) == "vn")
       {
@@ -375,10 +381,21 @@ namespace LPS
 
   void Object3D::Draw()
   {
+    m_model = 1.0f;
+    m_model = glm::translate(m_model, m_position);
+    m_model = glm::rotate(m_model, glm::radians(m_rotation.x),
+                          glm::vec3{ 1.0f, 0.0f, 0.0f });
+    m_model = glm::rotate(m_model, glm::radians(m_rotation.y),
+                          glm::vec3{ 0.0f, 1.0f, 0.0f });
+    m_model = glm::rotate(m_model, glm::radians(m_rotation.z),
+                          glm::vec3{ 0.0f, 0.0f, 1.0f });
+    m_model = glm::scale(m_model, m_scale);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_tex);
     glBindVertexArray(m_vao);
     glPolygonMode(GL_FRONT_AND_BACK, m_frame_mode ? GL_LINE : GL_FILL);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
   }
 }

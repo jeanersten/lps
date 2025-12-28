@@ -28,7 +28,8 @@ namespace LPS
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    m_object = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
+    m_object = glfwCreateWindow(m_width, m_height, m_title.data(),
+                                nullptr, nullptr);
 
     if (m_object == nullptr) std::exit(-1);
 

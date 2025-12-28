@@ -17,6 +17,31 @@ namespace LPS
 
     void Draw() override;
 
+    inline glm::vec3 GetPosition() const
+    {
+      return m_position;
+    }
+
+    inline glm::vec4 GetColor() const
+    {
+      return m_color;
+    }
+
+    inline void SetPosition(glm::vec3 val)
+    {
+      m_position = val;
+    }
+
+    inline void SetRotation(glm::vec3 val)
+    {
+      m_rotation = val;
+    }
+
+    inline void SetScale(glm::vec2 val)
+    {
+      m_scale = val;
+    }
+
     inline void SetDrawFrameMode(bool val)
     {
       m_frame_mode = val;
@@ -35,9 +60,13 @@ namespace LPS
       glm::vec2 tex_coord;
     };
 
+    glm::vec3 m_position;
+    glm::vec3 m_rotation;
+    glm::vec2 m_scale;
+    glm::mat4 m_model;
+
     std::vector<Vertex> m_vertices;
     std::vector<GLuint> m_indices;
-    glm::vec3 m_position;
     glm::vec2 m_size;
     glm::vec4 m_color;
 

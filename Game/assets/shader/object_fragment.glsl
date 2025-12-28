@@ -1,5 +1,13 @@
 #version 330 core
 
+#define MAX_LIGHT 8
+
+struct Light
+{
+  vec3 position;
+  vec3 color;
+};
+
 in vec3 Position;
 in vec3 Normal;
 in vec4 Color;
@@ -8,29 +16,52 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform sampler2D u_Sampler;
-uniform vec3 u_LightColor;
-uniform vec3 u_LightPosition;
+uniform bool u_Lighting;
+uniform int u_LightCount;
+uniform Light u_Lights[MAX_LIGHT];
+uniform float u_LightLinear;
+uniform float u_LightQuadratic;
 uniform vec3 u_ViewPosition;
 
 void main()
 {
-  float ambient_strength = 0.1f;
-  vec3 ambient           = ambient_strength * u_LightColor;
+  vec3 albedo = texture(u_Sampler, TexCoord).rgb * Color.rgb;
 
-  vec3 norm      = normalize(Normal);
-  vec3 light_dir = normalize(u_LightPosition - Position);
-  float diff     = max(dot(norm, light_dir), 0.0f);
-  vec3 diffuse   = diff * u_LightColor;
+  if (u_Lighting)
+  {
+    vec3 norm = normalize(Normal);
+    vec3 view_dir = normalize(u_ViewPosition - Position);
 
-  vec3 view_dir           = normalize(u_ViewPosition - Position);
-  vec3 reflect_dir        = reflect(-light_dir, norm);
-  float spec              = pow(max(dot(view_dir, reflect_dir), 0.0f), 32);
-  float specular_strength = 0.5f;
-  vec3 specular           = specular_strength * spec * u_LightColor;
+    float ambient_strength = 0.15f;
+    vec3 lighting = ambient_strength * vec3(1.0f);
 
-  vec3 lighting = (ambient + diffuse + specular);
+    for (int i = 0; i < u_LightCount; i++)
+    {
+      vec3 light_to_frag = u_Lights[i].position - Position;
+      float light_dist   = length(light_to_frag);
+      vec3 light_dir     = normalize(light_to_frag);
 
-  vec3 albedo = vec3(texture(u_Sampler, TexCoord).rgb * Color.rgb);
+      float attenuation = 1.0f / (1.0f + u_LightLinear * light_dist +
+                                  u_LightQuadratic * light_dist * light_dist);
 
-  FragColor = vec4(albedo * lighting, Color.a);
+      float diffuse_factor = max(dot(norm, light_dir), 0.0f);
+      vec3 diffuse         = diffuse_factor * u_Lights[i].color;
+
+      vec3 halfway_dir = normalize(light_dir + view_dir);
+
+      float specular_strength = 0.5f;
+
+      float specular_factor = pow(max(dot(norm, halfway_dir), 0.0), 64.0);
+      vec3 specular         = specular_strength * specular_factor *
+                              u_Lights[i].color;
+
+      lighting += (diffuse + specular) * attenuation;
+    }
+
+    FragColor = vec4(albedo * lighting, Color.a);
+  }
+  else
+  {
+    FragColor = vec4(albedo, Color.a);
+  }
 }

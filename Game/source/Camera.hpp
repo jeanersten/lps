@@ -37,6 +37,26 @@ namespace LPS
       return m_pos;
     }
 
+    inline float GetYaw() const
+    {
+      return m_yaw;
+    }
+
+    inline float GetPitch() const
+    {
+      return m_pitch;
+    }
+
+    inline float GetFov() const
+    {
+      return m_fov;
+    }
+
+    inline void SetPosition(glm::vec3 val)
+    {
+      m_pos = val;
+    }
+
     inline void SetSize(glm::vec2 val)
     {
       m_size = val;
