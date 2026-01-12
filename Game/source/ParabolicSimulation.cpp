@@ -8,7 +8,7 @@ namespace LPS
     : m_state(PS_STATE_PAUSE)
     , time(0.0f)
     , total_time(0.0f)
-    , ipos(0.0f, 0.0f, 0.0f)
+    , ipos(0.0f, 1.0f, 0.0f)
     , ivel(10.0f)
     , langle(45.0f)
     , pos(ipos)
@@ -55,8 +55,23 @@ namespace LPS
 
   void ParabolicSimulation::Reset()
   {
+    double theta{ glm::radians(langle) };
+    double vy0{ ivel * glm::sin(theta) };
+    double a{ -0.5f * grv };
+    double b{ vy0 };
+    double c{ ipos.y - 1.0f };
+    double discriminant{  b * b - 4.0f * a * c };
+    
+    if (discriminant >= 0.0f)
+    {
+      total_time = (-b - glm::sqrt(discriminant)) / (2.0f * a);
+    }
+    else
+    {
+      total_time = 0.0f;
+    }
+
     time = 0.0f;
-    total_time = (2.0f * ivel * glm::sin(glm::radians(langle))) / grv;
     pos = ipos;
   }
 }
