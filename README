@@ -1,1 +1,16 @@
 # Little Physics Simulation
+
+The term "Game" as you can see as one folder in the repository named Game might
+be misleading, it is not a game. It is just a little physics simulation,
+specifically parabolic movement simulation (at least for now). I have to admit
+that it is not the most optimized code I should've written. I'm dumb and I'm not
+able to learn things while also thinking how should the OpenGL renderer or C++
+code best to be implemented. So if anyone see this, just want let you to know
+that if you think the architecture or implementation is crap, then that is the
+reason.
+
+One may ask why not use Markdown so that "I can see the demo". I don't like it.
+I think I'm cursed with perfectionism and I can't handle it. I just can't see
+README.md but not LICENSE.md and yes I hate LICENSE.md. I prefer pure LICENSE
+without any extension. Anyway, talking about license, this is licensed under MIT
+License so there's not much restriction.
