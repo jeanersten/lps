@@ -6,6 +6,7 @@
 #include "Grid.hpp"
 #include "InfoPanel.hpp"
 #include "Light.hpp"
+#include "ParabolicSimulation.hpp"
 #include "PlaybackPanel.hpp"
 #include "Window.hpp"
 #include <memory>
@@ -28,6 +29,8 @@ namespace LPS
 
     float m_time;
     float m_delta_time;
+
+    std::unique_ptr<ParabolicSimulation> m_simulation;
 
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<InfoPanel> m_info_panel;

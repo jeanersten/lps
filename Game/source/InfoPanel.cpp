@@ -8,6 +8,7 @@ namespace LPS
     , running_time(0.0f)
     , fps(0.0f)
     , view_pos(0.0f, 0.0f, 0.0f)
+    , ball_pos(0.0f, 0.0f, 0.0f)
     , m_size(0.0f, 0.0f)
   {}
 
@@ -37,7 +38,7 @@ namespace LPS
         ImGuiWindowFlags_NoBackground
       };
 
-      ImGui::Begin("Info Panel", nullptr, flags);
+      ImGui::Begin("##wnd", nullptr, flags);
 
       m_size.x = ImGui::GetWindowWidth();
       m_size.y = ImGui::GetWindowHeight();
@@ -45,24 +46,26 @@ namespace LPS
       fps = io.Framerate;
 
       auto text_right = [](const char* fmt, auto value)
-        {
-          char buf[64]{ };
+      {
+        char buf[64]{ };
 
-          std::snprintf(buf, sizeof(buf), fmt, value);
+        std::snprintf(buf, sizeof(buf), fmt, value);
 
-          float avail{ ImGui::GetContentRegionAvail().x };
-          float text_w{ ImGui::CalcTextSize(buf).x };
+        float avail{ ImGui::GetContentRegionAvail().x };
+        float text_w{ ImGui::CalcTextSize(buf).x };
 
-          ImGui::SetCursorPosX(ImGui::GetCursorPosX() + avail - text_w);
-          ImGui::TextUnformatted(buf);
-        };
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + avail - text_w);
+        ImGui::TextUnformatted(buf);
+      };
 
       text_right("Average FPS: %.1f", fps);
       text_right("Time running: %.1fs", running_time);
       text_right("View X: %.1f", view_pos.x);
       text_right("View Y: %.1f", view_pos.y);
       text_right("View Z: %.1f", view_pos.z);
-
+      text_right("BALL X: %.1f", ball_pos.x);
+      text_right("BALL Y: %.1f", ball_pos.y);
+      text_right("BALL Z: %.1f", ball_pos.z);
 
       ImGui::End();
     }

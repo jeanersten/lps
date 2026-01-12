@@ -15,6 +15,7 @@ namespace LPS
     float running_time;
     float fps;
     glm::vec3 view_pos;
+    glm::vec3 ball_pos;
 
     void Draw() override;
 

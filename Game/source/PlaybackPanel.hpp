@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Interface.hpp"
+#include "ParabolicSimulation.hpp"
 #include <glm/glm.hpp>
 #include <functional>
 
@@ -13,6 +14,7 @@ namespace LPS
 
     bool visible;
     float left_padding;
+    ParabolicSimulation* simulation;
 
     void Draw() override;
 

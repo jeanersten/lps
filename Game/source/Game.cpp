@@ -6,6 +6,7 @@
 #include "Grid.hpp"
 #include "InfoPanel.hpp"
 #include "Light.hpp"
+#include "ParabolicSimulation.hpp"
 #include "PlaybackPanel.hpp"
 
 namespace LPS
@@ -15,6 +16,7 @@ namespace LPS
     , m_window(640, 480, "Little Physics Simulation")
     , m_time(0.0f)
     , m_delta_time(0.0f)
+    , m_simulation(nullptr)
     , m_camera(nullptr)
     , m_debug_panel(nullptr)
     , m_playback_panel(nullptr)
@@ -60,6 +62,8 @@ namespace LPS
     ImGui_ImplGlfw_InitForOpenGL(m_window.GetNativeWindow(), true);
     ImGui_ImplOpenGL3_Init(glsl_ver);
 
+    m_simulation = std::make_unique<ParabolicSimulation>();
+
     float wnd_width{ static_cast<float>(m_window.GetWidth()) };
     float wnd_height{ static_cast<float>(m_window.GetHeight()) };
 
@@ -74,14 +78,16 @@ namespace LPS
     );
     m_grid = std::make_unique<Grid>(m_camera.get());
 
+    m_window.Maximize();
+
     m_debug_panel->cam = m_camera.get();
     m_debug_panel->visibility_callback = [this](bool visible) -> void {
       HandlePanelVisibility(visible);
     };
 
-    m_ball->debug_panel = m_debug_panel.get();
+    m_playback_panel->simulation = m_simulation.get();
 
-    m_window.Maximize();
+    m_ball->debug_panel = m_debug_panel.get();
   }
 
   Game::~Game()
@@ -140,6 +146,7 @@ namespace LPS
 
     m_info_panel->running_time = m_time;
     m_info_panel->view_pos = m_camera->GetPosition();
+    m_info_panel->ball_pos = m_ball->GetPosition();
     m_playback_panel->left_padding = m_debug_panel->GetSize().x;
 
     float wnd_width{ static_cast<float>(m_window.GetWidth()) };
@@ -189,8 +196,20 @@ namespace LPS
         m_debug_panel->rot_light_dist
     };
 
-    m_llight->SetPosition(glm::vec3{ lrot.x, lrot.y, lrot.z });
-    m_rlight->SetPosition(glm::vec3{ -lrot.x, lrot.y, -lrot.z });
+    glm::vec3 rrot{
+      m_ball->GetPosition().x - glm::cos(m_time) *
+        m_debug_panel->rot_light_dist,
+      m_ball->GetPosition().y,
+      m_ball->GetPosition().z - glm::sin(m_time) *
+        m_debug_panel->rot_light_dist
+    };
+
+    m_llight->SetPosition(glm::vec3{ lrot });
+    m_rlight->SetPosition(glm::vec3{ rrot });
+
+    m_simulation->Update(m_delta_time);
+
+    m_ball->SetPosition(m_simulation->pos);
   }
 
   void Game::Render()
