@@ -20,6 +20,7 @@ namespace LPS
 
     glm::vec3 pos;
     float grv;
+    float drag;
 
     enum State
     {

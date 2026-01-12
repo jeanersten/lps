@@ -151,6 +151,16 @@ namespace LPS
         simulation->Reset();
       }
 
+      // Drag
+      float drag{ simulation->drag };
+      ImGui::Text("Drag        :"); ImGui::SameLine();
+      ImGui::SetNextItemWidth(input_width);
+      if (ImGui::InputFloat("##drag", &drag, 0.0f, 0.0f, "%.1f m/s"))
+      {
+        simulation->drag = drag;
+        simulation->Reset();
+      }
+
       ImGui::End();
     }
 
