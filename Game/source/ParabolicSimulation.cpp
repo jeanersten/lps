@@ -49,7 +49,9 @@ namespace LPS
     float theta{ glm::radians(langle) };
     float vx0{ ivel * glm::cos(theta) };
     float vy0{ ivel * glm::sin(theta) };
-    
+
+    // Don't know enough about this formula, refer to this:
+    // https://farside.ph.utexas.edu/teaching/336k/lectures/node29.html
     if (drag > 0.0f)
     {
       float exp_drag{ glm::exp(-drag * t) };
@@ -82,9 +84,13 @@ namespace LPS
                  (1.0f - exp_drag) - (grv / drag) * t_mid };
         
         if (y > 1.0f)
+        {
           t_min = t_mid;
+        }
         else
+        {
           t_max = t_mid;
+        }
       }
       
       total_time = (t_min + t_max) * 0.5f;
